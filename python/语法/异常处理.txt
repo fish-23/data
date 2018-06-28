@@ -1,0 +1,35 @@
+﻿# 异常处理
+# try except 处理异常
+# 如果 try里面一条语句出错了，下面的语句将不会被执行，例如x = 1/0后面的语句不会被执行，会直接执行except语句，再执行finally语句
+# 如果没有错误，会跳过except执行后面的语句，finally语句有无异常都会被执行，else和finally可以省略
+# 捕获异常时，在基类捕获异常，同时也会捕获到子类的所有异常，所有的错误类型都继承自BaseException
+try:
+    print('try...')
+    x = 1/0
+    r = 10 / int('2')
+    print('result:', r)
+except BaseException as e:
+    print('ValueError:', e)
+else:
+    print('no error!')
+finally:
+    print('finally...')
+print('END')
+# format_exc() 用于捕捉异常，返回字符串
+import traceback
+def fish():
+    try:
+        x = 1
+        y = 2/0
+        print('right')
+    except Exception as e:
+        print(e)  # division by zero
+        print('err is:%s'%traceback.format_exc())        
+fish()
+# raise 可以自己触发异常，触发异常后，后面的代码也就不执行了
+def fish():
+    x = 2
+    if x == 1:
+        raise Exception("err",x) # Exception: ('err', 1)
+    print('123')
+fish()

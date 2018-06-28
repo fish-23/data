@@ -1,0 +1,12 @@
+﻿# struct(bytes类型转换)
+# 解决bytes和其他二进制数据类型的转换
+# pack的第一个参数是处理指令，第二个参数要和处理指令一致
+# I表示4字节无符号整数，>表示网络序
+import struct
+x = struct.pack('>I', 10240099)
+print(x)  # b'\x00\x9c@c'
+
+# unpack把bytes变成相应的数据类型
+# I：4字节无符号整数，H：2字节无符号整数
+x = struct.unpack('>IH', b'\xf0\xf0\xf0\xf0\x80\x80')
+print(x)  # (4042322160, 32896)

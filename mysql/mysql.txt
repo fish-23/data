@@ -1,0 +1,403 @@
+﻿# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+
+1，安装卸载
+（1）安装
+        yum -y install mariadb mariadb-server  (安装mariadb)
+        systemctl start mariadb  (启动mariadb)
+        systemctl enable mariadb  (设置开机启动)
+        mysql_secure_installation  (对mariadb进行设置)
+        备注：https://blog.csdn.net/jxq0816/article/details/79797304
+（2）卸载
+        yum -y remove mari*    (卸载mysql)
+        rm -rf /var/lib/mysql/*  (删除相关文件)
+
+
+2， DDL语句：数据定义语言
+（1）连接
+     (1) mysql -uwlp  -p（连接数据库）
+        # -u 后面跟数据库用户   -p 代表需要密码
+        # 命令结束符 ;  或 \g
+        # 显示的结果中 id 后面是到目前连接的次数
+        # 显示的结果中  版本信息 5.1.9-beta-log(测试版)，beta换成standard表示标准版
+（2）库操作
+      (1) show databases; （看系统中有哪些数据库）
+         # information_schema 存储了数据库中的一些对象信息
+         # mysql 存储了系统中用户权限问题
+         # text 系统自动创建的测试数据库，客户可以使用
+      (2) create database fish;（创建数据库）
+         # Query OK  表示操作成功
+         # 1 row affected  表示只影响了一条数据
+         # (0.00 sec)  表示用的时间
+         # 当这个数据库存在提示 database exists
+      (3) drop database fish;（删除数据库）
+         # 执行完drop语句后都会提示  "0 rows affected"
+      (4) use fish;（进入数据库）
+（3）表操作
+      (1) show tables;（产看数据库中的表）
+      (2) create table user(name varchar(10), time datetime, balance int(2)); （创建数据表）
+         # user：数据库名  name,time,balance：字段名  varchar(10)，datetime，int(2)：字段类型
+      (3) drop table user; （删除数据表）
+（4）结构
+      (1) desc user; （产看表结构）
+      (2) show create table user; （查看表创建过程）
+         # \G  将输出按列显示,也就是按照字段竖向排列
+         # show create table user \G     
+（5）表字段
+      (1) alter table user add column name varchar(20);   （增加表字段）
+          (1) alter table user add column name varchar(20) not Null;
+             # not Null 增加的字段不能为空
+          (2) alter table user add age int(3) after name;
+             # 将age int(3) 添加到 name字段 之后
+      (2) alter table user drop column name;              （删除表字段）
+      (3) alter table user modify name varchar(20);       （更改表字段类型）
+      (4) alter table user change name name1 varchar(20); （更改字段名）
+         # 用change修改是得写两次字段名，但是可以修改字段名，modify反之
+      (5) alter table user modify age int(3) first;       （修改表字段位置，放到第一位）
+      (6) alter table fish rename fish23;                 （修改表名）
+
+      
+3， DML语句：数据操纵语言
+（1）增
+        (1) insert into user(name,cellphone,age) values('ocean','123',8);  （插入一条数据）
+        (2) insert into user values('ocean','123',8);
+           # 插入数据时也可以不写字段名，但是数据顺序应和字段顺序对应
+        (3) insert into user(name,age) values('sea',6),('ocean',9);        （插入多条数据）
+        (4) insert into user values('sea',6),('ocean',9),('fish',5);
+        (5) insert into user select * from t;  
+           # 将user表里面的全部数据再存一遍
+（2）改
+        (1) update user set age=12 where id=2;    （更改一条数据）
+        (2) update user a,product b set b.name='cat',a.name='tom' where a.id=2 and b.id=2;  (更改两个表里的数据) 
+（3）删
+        (1) delete from user where id=1;   (删除一条数据)
+        (2) delete from user;   (删除一个表里的全部数据)
+        (3) delete from user where id is NULL;  (删除NULL数据)
+        (4) delete a,b from user a,product b where a.id=1 and b.id=2;  (删除两个表里的数据)
+（4）查
+        (1) select * from user;  (查询一个表里的所有数据)
+        (2) select name,age,length(name) from user;  (查询一个表里的指定字段的数据)
+           # length(name)   表示name字段数据的长度
+        (3) select distinct name from user;  (查询不重复的数据)
+           # 用 distinct 关键字来去重，重复的数据只会显示一条
+        (4) select * from user where id=2;   (条件查询)
+        (5) select * from user order by age desc  (排序)
+           # order  by 用于排序，顺序(升序，从小到大) asc，逆序(降序)desc
+        (6) select * from user order by birth,age desc (排序，两个条件)
+           # 先按照birth顺序排列，如果里面有birth一样的，按照age逆序排列
+        (7) select * from user order by age limit 3;
+           # limit 3 表示显示三条数据
+        (8) select * from user order by id limit 2,3;
+           # limit 2,3 显示三条数据，从排序后的第三条开始显示，忽略前两条
+（5）聚合      
+        # select  聚合函数   from  表   where  筛选条件  group by  聚合字段  with rollup  聚合后再汇总   having  对结果再过滤
+        # 常用聚合函数：sum(求和)，count(*)(记录数)，max(最大值)，min(最小值)
+        # count(*) 会统计表里面的数据条数，count(字段名)会统计字段数据的条数，会忽略空字段
+        # count(*)，count(1)，count(2) 都是可以的，count(1)把每一行当做1 然后看有多少个，一般用count(*)就可以了
+        # having 是对聚合后的数据进行过滤      where是对聚合前的数据进行过滤
+       (1) select count(*) from user;
+          # 统计user表里面的数据条数(包含NULL值)
+       (2) select count(age) from user;
+          # 统计user表里age字段的数据条数(NULL值会被忽略)
+       (3) select birth,count(*) from user group by birth;
+          # 根据user表里面的birth字段进行聚合，会显示每组数据的条数，例如1992年出生的有几条数据
+       (4) select birth,count(age) from user group by birth;
+          # 根据user表里面的birth字段进行聚合,显示聚合后每组age的条数，如果那个birth对应的age是NULL，,count(age)就是0
+       (5) select birth,count(*) from user group by birth with rollup;
+          # 结果在 统计每条数据出现次数 的基础上 再统计这些次数的总和(就是这个表数据的总和)
+       (6) select birth,count(*) from user group by birth having count(*)>3;
+          # 统计出生日期相同的，人数总和大于3的日期
+       (7) select sum(age),max(age),min(age) from user;
+          # 统计user表中的年龄总和，最大年龄和最小年龄
+（6）表连接
+        # 表连接分内连接和外连接，内连接会选出两张表里面相匹配的记录，外连接会选出不匹配的记录
+       (1) 两表内容查询
+          select user.*,product.* from user,product;
+          select birth,name from user,product where user.id=1 and product.id=2;
+          # 查询两个表里的信息，当两个表里有相同的字段名时，就要加上表名，用于区分
+          select user.name,product.name from user,product where user.id=1 and product.id=2;        
+      (2) 两表关联查询
+         select * from user,product where user.id=product.id;
+         select user.*,product.* from user,product where user.id=product.id;
+         # 只会查询列出user和product这两个表里面id相同的数据
+      (3) 内连接(inner join)
+         select * from user  join product on user.id=product.id;
+         select * from user inner join product on user.id=product.id;
+         # 内连接和两表关联查询是一样的，就是表示形式不同，上面两种表示是一样的
+      (4) 左连接(left    join)
+         select * from user left join product user.id=product.id;
+         # 两边都有的会显示(也就是内连接查询的结果会显示)，左边有右边没有，显示左边的内容，右边用NULL显示
+      (5) 右连接(right  join)
+         select * from user right join product user.id=product.id;
+         # 左连接显示左边，右连接显示右边(右链接,以右表为参照,显示所有数据;)
+      (6) 连接，聚合综合问题
+         (1) select * from blog join users
+         # 查询blog 和users两表信息
+         (2) select * from blog join users where users.id=blog.uid;
+         # 查询两表users.id 和 blog.uid 相同的数据
+         (3) select  users.id,count(*) from blog join users where users.id=blog.uid;
+         # 统计id相同数据的总条数
+         (4) select users.id, count(blog.entry) from blog join users where users.id=blog.uid; 
+         # 统计id相同数据中blog.entry 字段真实数据(不为NULL)的条数
+         (5) select users.id, count(blog.entry) from blog join users where users.id=blog.uid group by users.id;
+         #  先将查询的结果用users.id来聚合，再统计聚合后每个users.id对应的数据条数
+         (6) select users.id, count(blog.entry) from blog left join users on users.id=blog.uid group by users.id;
+         # 左连接，两边都有的会显示(也就是内连接查询的结果会显示)，左边有右边没有，显示左边的内容，右边用NULL显示
+         #  users.id=blog.uid 这个是查询条件，左边(blog表)的uid只有1和2，没有比右边多的uid，所以查询结果会和内聚合一样
+         (7) select users.id, count(blog.entry) from blog right join users on users.id=blog.uid group by users.id
+         # 右连接，右边(user表) 有的 id 3,4,5，左边没有，会显示右边这些数据，左边的数据用NULL代替，因为添加了聚合，所以统计的条数为0         
+（7）子查询
+        # 在select查询结果的基础上再进行查询
+       (1) select * from user where id in(select id from product);
+           # 先查询出product表中的id，然后在这个id的基础上查询user表里面的信息
+       (2) select * from user where id = (select id from product limit 1);
+           # 当第一次查询的数据是确定的一条时，就可以用=代替in
+           select * from user where id = (select id from product);  (会报错)
+           select * from user where id = (select id from product limit 2);  (会报错)
+           # 当第一次查询的结果不固定，不是一条数据时就就会报错
+       (3) 将子查询转化成表连接
+            select * from user where id in(select id from product);
+            select user.* from user,product where user.id = product.id;
+            select user.* from user join product on user.id = product.id;
+（8）记录联合
+        # 将两表查询的结果联合到一块来显示，需要用到 union  和union all  关键字
+        # union all 会将结果组合起来显示，union  会将结果组合起来，去除重复数据后显示
+        (1) select name from user union all select id from product;
+        (2) select id from user union  select id from product;
+
+
+4，数据类型
+（1）数值类型
+       (1) 整数类型：tinyint(1个字节)，smallint(2个字节)，mediumint(3个字节)，int(4个字节)，bigint(8个字节) 
+           (1) int(11)，括号里面的数字表示显示宽度，默认为11，意思是存的数字不到11位前面用0来补充(默认情况下，0会被省略)
+           (2) 整数类型属性：zerofill(宽度不够用0填充)，auto_increment(从1开始，逐行递增，一般用于id)
+               alter table product add column number int(5) zerofill;
+                 # 在product表里面增加字段number，指定为int类型，宽度为5，zerofill表示，当存的数不够5位时用0填充
+                 # 如果给字段指定类型和宽度 int(5)，当存入的整数大于5位为7位时，这个宽度设定会失效，存进去的是7位的数字
+              alter table product add column id int auto_increment not null primary key
+                # 在product表里面增加字段id   auto_increment选项，每添加一条数据，id字段会自动增加1
+                # not null  和  primary key 定义auto_increment字段需要添加这两个选项
+       (2) 浮点数类型：float(4个字节)，double(8个字节)   
+       (3) 定点数类型：decimal(字节由(M,D)来确定)   
+           (1)  (M,D)  M(精度) (表示整数和小数的位数和)   D(标度)(表示小数位数)  
+           (2)  浮点数类型，不加精度和标度，会自动存储数据，不会报错。加上精度和标度，会四舍五入达到标度和精度的要求
+                 float(4,2)   23.459(存 23.46)    123.456(存99.99)
+           (3)  定点数类型，不加精度和标度，会按decimal(10,0)来操作，数据超越了精度和标度，会报警，也会四舍五入存储，加上结果相同
+                 decimal(4,2)   23.459(存 23.46)    123.456(存99.99)
+      (4) 位类型(bit(M))：存储二进制数  
+           (1) M的范围是1位到64位,如果不指定，默认为1位
+                alter table user add column age bit;   (age字段最多只能存1位二进制数，1或者0)
+                alter table user add column age bit(5);   (age字段能存5位二进制数)
+           (2) 对于位字段，直接用select命令无法查看，需要用bin()(显示为二进制格式)   hex()(显示为十六进制格式)函数进行读取
+                select * from user ;  (无法读取)
+                select bin(age)  from user; (可以读取age的值)
+（2）日期时间类型
+       (1)  date(表示年月日)，datetime(年月日时分秒)，time(时分秒)，timestamp(当前时间的年月日时分秒)   year(年)
+       (2)  now()  函数，给时间类型字段插入当前时间
+             insert into user(datetime) values(now());
+       (3)  创建timestamp类型的字段时，系统会默认为当前时间，不添加或者添加NULL都会自动添加当前系统时间
+             timestamp类型 上限  '1970-01-01 08:00:01'   下限  '2038-01-19 11:14:07'  当插入的时间超过上下限，会用0来替换
+       (4)  year的范围是 1901~2155
+（3）字符串类型     
+       (1) char(定长，存字符)，varchar(变长，存字符)，binary(定长，存二进制字符)， varbinary(变长，存二进制字符)
+           (1)  char(10)  表示存储定长的10个字符，如果存的一个字符串不到10个字符，会在后面用空格自动补全。
+                               在检索时(例如用select查看)会自动删除数据后面的空格。最大上限是10个字符，超过10个字符，只会存10个字符
+                               alter table t add column c char;    默认  char(1)
+                 varchar(10)  表示存可变长字符，存几个字符就是几个字符，存3个字符就是3个字符。
+                                    最大上限是10个字符，超过10个字符，只会存10个字符，存的是什么，检索出来也是什么。
+                                     alter table t add column v varchar(20);   没法默认，新建字段类型时，需要赋值
+           (2)  binary(10)  类似char，不过存储的是二进制数据，表示存储定长的10个二进制字符，有默认，binary(1)
+                 varbinary(10)  表示存可变长二进制字符，存几个二进制字符就是几个二进制字符，没默认，需要指定
+       (2) tinytext(1个字节)，text(2个字节)，mediumtext(3个字节)，longtext(4个字节)
+            tinyblob(1个字节)，blob(2个字节)，mediumblob(3个字节)，longblob(4个字节)   类似text 二进制
+           (1)  text 类型的
+       
+       (3) set  enum  枚举类型
+
+
+5，运算符
+（1）算术运算符
+       (1)  加(+)  减(-)  乘(*)  除(/ )  取余(% mod)
+             select 1+1,  1-2,  2*3,    1/0,      9%2,  mod(9,2),  1/2
+                       2       -1    6        NULL    1       1               0.5000
+（2）比较运算符
+       (1)  <=>(相当于=，这个可用于null的比较)  between(存在指定范围内)   in(存在指定集合内)  is null(是 NULL)    like(通配符匹配)  rlike(正则表达式匹配)
+       (2)  select 11 between 10 and 20;      这个例子只要between前面的数，大于等于最小的，小于等于最大的，都是正确的
+       (3)  select  'x'  in ('z','x','r');
+       (4)  delete from user set age is null;
+       (5)  select 12345 like '%45%';
+       (6)  select 'asdf' rlike 's';
+（3）逻辑运算符
+       (1)  not(逻辑非)，and(逻辑与)，or(逻辑或)，xor(逻辑异或，两数相同为错)
+（4）位运算符
+       (1)  先将数字转化成二进制数字，然后再通过位运算符进行计算
+       (2)  &(位与，同1为1，其余为0)    | (位或，有1为1)    ^(位异或，相同为0，其余为1)
+             ~(位取反，0换1，1换0)    >>(位右移，例如右位移3，右边去除3个字符，左边增加3个字符)    <<(位左移，与右位移相反)
+
+
+6，常用函数
+（1）字符串函数
+       (1)  concat() 将参数连成一个字符串
+             select concat('asd','fgh'),  concat('zzxc',111),  concat('sdf',null);   # asdfgh  zzxc111  NULL                       
+       (2)  insert() 字符串替换
+             select insert('123456789',2,3,'ab');  
+             # 1ab56789  将前面的字符串，从第2位开始，连续的3位字符用 ab来替换
+       (3)  lower()  upper()  将字符串转化为小写和大写
+             select lower('ASDfg'), upper('asdFG');  
+             # asdfg  ASDFG
+       (4)  left()  right()   分别返回字符串最左边，最右边多少个字符
+             select left('1234',2), right('1234',1);
+             # 12  4
+       (5)  lpad()  rpad()  用字符串进行填充
+             select lpad('zxc',7,'12'), rpad('qwe',6,'89');
+             # 1212zxc  qwe898 用12对zxc进行左填充，总共填充够7个字符，后面的为右填充
+       (6)  ltrim()  rtrim()  去掉字符串左边或者右边的空格
+             select ltrim('  123'), rtrim('123  ');
+             # 123 123
+       (7)  repeat()  将字符串打印n次
+             select repeat('zxc',3);   #  zxczxczxc
+       (8)  replace()  用字符串b替换字符串中出现的所有字符串a
+             select replace('12as12as12as','as','00');  # 120012001200
+       (9)  strcmp()  比较两个字符串ASCII码的大小,前后相等为0，前小后大为-1，前大后小为1
+             select strcmp('a','d');  # -1
+       (10) trim()  去掉字符串开头和结尾的空格
+             select trim('  12  ');  #  12
+       (11) substring()  返回字符串从x位起y个字符长度的字符串
+              select substring('1234567890', 2,4);
+              # 2345   返回从第2位起，4个字符所组成的字符串
+（2）数值函数
+       (1）abs()  返回数值的绝对值
+             select abs(-3);  # 3
+       (2)  ceil()  返回大于数值的最小整数
+             select ceil(-1.2), ceil(1.2);  #  -1  2
+       (3)  floor()  返回小于数值的最大整数
+             select floor(-1.2), floor(1.2);  # -2  1
+       (4)  mod()  两个数值进行取余
+             select mod(3,2), mod(3,0), mod(3,null), mod(null,3); 
+             # 1  NULL  NULL  NULL
+       (5)  rand()  返回0~1 内的随机数
+             select rand();  #  0.9714713059100055
+             select ceil(rande() * 100);   # 43   随机产生一个100以内的整数
+       (6)  round()  将x保留y位小数(四舍五入)
+             select round(1.15, 1);   # 1.2
+       (7)  truncate()  将x的小数截取 y位(直接截取)
+             select truncate(1.235, 2);  # 1.23
+（3）时间函数
+       (1)  curdate()   返回当前时间(年月日)
+             select curdate();   #   2018-06-19
+       (2)  curtime()   返回当前时间(时分秒)
+             select curtime();   #   08:01:35   
+       (3)  now()   返回当前时间(年月日时分秒)
+             select now();    #  2018-06-19 08:03:02
+       (4)  unix_timestamp()   将时间转化为时间戳
+             select unix_timestamp(now());   #  1529366727
+       (5)  from_unixtime()   将时间戳转化成时间
+             select from_unixtime(1529366727);   #  2018-06-19 08:05:27
+       (6)  year()   week()   返回指定时间的年份和这个时间是当年的第几周
+             select year(now()),week(now());   # 2018 24
+       (7)  hour() minute()  返回指定时间的时和分
+             select hour(now()), minute(now());   # 8   11
+       (8)  monthname()    返回当前时间月份的英文名称
+             select monthname(now());    #   June
+       (9)  date_fromat()  将时间按照指定时间格式进行显示
+             select date_format(now(), '%Y,%m,%d,%h,%i,%s');
+             # 2018,06,19,08,31,36
+       (10) datediff()  计算两个时间相差几天
+              select datediff('2018-08-08', now());   # 50
+（4）流程函数
+       (1)  if()  将数据进行区分 3个参数，第1个是条件，第2个是满足条件显示的字符串，第3个是不满足显示的字符串
+             select if(age>30, 'old', 'young')  from user;
+       (2)  ifnull()   将null数据按照指定字符进行替换
+             select ifnull(age, 0) from user;
+             select ifnull(age, 'a') from user;
+       (3)  case when ... then ... else ... end     h和if()类似
+             select case when age>30 then 'old' else 'ypong' end from user;
+       (4)  case ... when ... then ... else ... end   将多个档次的数据进行标记
+             select  case age when 30 then 'old' when 10 then 'young' else 'midlife' end from user;
+（5）其他函数
+       (1)  database()  显示当前数据库名
+             select database();    # wlp
+       (2)  version()   返回当前数据库版本
+             select version();   #   5.5.56-MariaDB 
+       (3)  user()  返回当前登录用户
+             select  user();   # root@localhost
+       (4)  inet_aton()   返回ip地址的网络字节序表示
+             select inet_aton('114.67.224.92');    # 1917050972             
+       (5)  inet_ntoa()   返回网络字节数代表的ip
+             select inet_ntoa(1917050972);   # 114.67.224.92
+       (6)  password()  将字符串加密成一个41位长的字符串
+             select  password('123');    # *23AE809DDACAF96AF0FD78ED04B6A265E05AA257              
+       (7)  md5()   返回字符串的MD5值(用于加密)
+            select md5('123');   # 202cb962ac59075b964b
+
+
+7，表类型(存储引擎)的选择
+（1）查看设定
+       (1)  show variables like '%storage_engine%';   
+           # InnoDB   查看当前默认的存储引擎 
+       (2)  show engines \G  
+           # 查看当前数据库支持的存储引擎
+       (3)  show create table user \G  
+           # 看user表的创建过程，其中ENGINE=InnoDB  就是该表的存储引擎
+       (4)  create table user(id int, name varchar(20)) engine=myisam;
+           # 创建user表，并设定存储引擎是myisam
+       (5)  alter table user engine=innodb;
+           # 更改user表的存储引擎
+（2）特性
+       (1)  myisam
+            (1) 访问速度快，不支持事务，外键，数据文件和索引文件放在不同的路径下，平均分配IO，获得速度
+            (2) 支持的存错格式：静态表(默认)，动态表，压缩表
+            (3) 静态表：优点, 存储迅速，容易缓存，出现故障易恢复。缺点, 固定长度，占用空间较大，存储时不足宽度自动加空格，查询时忽略空格
+       (2)  memory 
+            (1) 数据存储在内存中，默认hash索引，服务关闭，数据丢失 
+       (3)  innodb
+            (1) 提供了事务安全功能(提交，回滚，崩溃恢复)，写入速率较差，会用较多的磁盘空间来存储数据和索引
+            (2) 自动增长列
+                alter table user modify id int auto_increment not null primary key;           
+                # 将一个表的的一个字段修改成自增长列时，这个列之前存储的数据，可以为null，但是不能有重复
+                insert into user(age)  values(3),(2),(5); 
+                # 再给自增长列增加数据时，存的id不能重复，不然会报错，可以存id，会以存储的为准，如果给其他字段存数据，id字段会自动增长
+                insert into user(id) values(0),(0),(null),(null);
+                # 可以给自增长列添加参数0和空，不会报错，会自动增长
+            (3) 对于innodb表，自动增长列必须是索引，如果是组合索引，必须是组合索引的第一列
+            (4) 外键约束
+                 (1) mysql 支持外键存储的只有innodb,要求父表必须有对应的索引，子表在创建的时候也必须有对应的索引
+                 (2) 在从表中，外键必须和主表对应，或者为null
+                 (3) create table country( country_id  int  unsigned  not null  auto_increment,
+                                                       country  varchar(50)  not null,
+                                                       last_update timestamp not null default current_timestamp on update current_timestamp,
+                                                       #  current_timestamp   在insert一条新记录的收， 时间字段自动获取到当前时间
+                                                       #  on update current_timestamp  时间字段随着update命令的更新实时变化
+                                                       #  如果两个属性都设置了， 那么时间字段默认为当前时间， 且随着记录的更新而自动变化
+                                                       primary key (country_id)  
+                                                       #  设置主键，主键一般是索引
+                                                     ) ;
+                     create table city( city_id  int  unsigned  not  null  auto_increment,
+                                                city varchar(50) not null,
+                                                country_id  int  unsigned  not  null,
+                                                last_update timestamp not null default current_timestamp on update current_timestamp,
+                                                primary key (city_id),
+                                                key idx_fk_country_id  (country_id),   
+                                                #  设置外键字段的索引，这个不是必须的，可以省略
+                                                constraint  fk_city_country foreign key (country_id)  references country (country_id) on delete restrict on update cascade
+                                                #  constraint  fk_city_country 可以省略，
+                                                #  foreign key (country_id) 设置city表的country_id为外键  references country (country_id)  外键关联country 表的country_id
+                                                # 子表创建外键时，可以指定操作，restrict ，cascade，set null ，当父表删除或者更新数据时，会进行相应的操作
+                                                #  restrict(子表在有关联记录的情况下，父表不能更新)   on delete restrict(在外键约束的情况下，主表数据不能被删除)
+                                                #  cascade(父表在更新或者删除数据时，子表的数据也会更新或者删除)  on update cascade(主表信息更改，从表数据也会被更改)
+                                                #  set null 父表在更新或者删除时，从表会被设置成 null
+                                                 );
+                 (4) 添加外键关联(一对多关系)
+                      主表(country)：create table country(id  int  primary key auto_increment,  name varchar(20));
+                      从表(city)：create table city(id int primary key auto_increment, name varchar(20), country_id int);
+                      外键约束：alter table city add constraint foreign key(country_id) references country(id) on delete cascade;
+                                      alter table city2 add foreign key(country_id) references country(id) on delete cascade;
+                (5) 添加外键关联(多对多关系)
+                      学生表(student)：create table student(id int primary key auto_increment, name varchar(20));
+                      教师表(teacher)：create table teacher(id int primary key auto_increment, name varchar(20));
+                      中间表(middle)：create table middle(id int primary key auto_increment, stu_id int, tea_id int);
+                      外键约束(student)：alter table middle add foreign key(stu_id) references student(id) on delete cascade on update cascade;
+                      外键约束(teacher)：alter table middle add foreign key(tea_id) references teacher(id) on delete cascade on update cascade;         
+                 (6) 关闭外键约束：set foreign_key_checks = 0;
+                      打开外键约束：set foreign_key_checks = 1;    
+            (5) 

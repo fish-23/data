@@ -1,0 +1,29 @@
+﻿# itertools(操作迭代对象)
+# count()函数，会创建一个无限的迭代器，参数：开始的数字，步长(隔几个数字)
+import itertools
+for i in itertools.count(0,2):
+    print(i)  # 1 2 4 6 8...
+
+# cycle()函数，会把传入的一个序列无限重复下去
+for i in itertools.cycle('asd'):
+    print(i)  # a s d a s...   
+
+# repeat()函数，重复一个元素，参数：元素，次数，没有第二个参数会一直重复下去
+for i in itertools.repeat('asd',3):
+    print(i)  # asd asd asd
+    
+# takewhile()：根据条件截取有限序列，参数：函数，迭代对象
+x = itertools.count(0,2)
+y = itertools.takewhile(lambda x: x <= 10, x)
+print(list(y))  # [0, 2, 4, 6, 8, 10]
+
+# chain()函数可以将两组迭代对象串联起来，生成一个迭代器(有限)
+x = itertools.chain('ABC', 'XYZ')
+for y in itertools.chain('ABC', 'XYZ'):
+    print(y) # A B C X Y Z
+  
+# groupby()函数，将迭代器里面相邻的重复元素取出来
+x = itertools.groupby('AABBCCAA')
+for key, group in itertools.groupby('AABBCAA'):
+    print(key, list(group)) # A['A', 'A']  B['B', 'B']  C['C']  A['A', 'A']
+

@@ -1,0 +1,200 @@
+﻿#  项目运行
+
+
+一，直接运行py文件
+
+1，python代码
+
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+from bottle import route, run, static_file,request
+@route('/')
+def todo():
+            return '你好，世界'
+run(host='127.0.0.1',port='10082',debug=True,reloader=True)
+
+
+2，运行
+curl http://127.0.0.1:10082/   # 你好，世界
+
+
+
+
+二，nginx反向代理
+
+1，python代码
+
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+from bottle import route, run, static_file,request
+@route('/')
+def todo():
+            return '你好，世界'
+run(host='127.0.0.1',port='10082',debug=True,reloader=True)
+
+
+2，nginx.conf配置
+
+user  root;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log;
+error_log  /var/log/nginx/error.log  notice;
+error_log  /var/log/nginx/error.log  info;
+
+pid        /run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    gzip  on;
+    include /etc/nginx/conf.d/*.conf;
+}
+
+
+3，admin.conf配置
+
+# nginx下面的一个配置文件
+# vim /etc/nginx/conf.d/admin.conf
+server {
+        # 监听的外网端口，就是浏览器访问的端口
+        listen                   10080;
+        # 浏览器访问的域名
+        server_name 114.67.224.92;
+        # 用外网10080端口代理内网10081端口
+        # 切记端口不能重复，外网端口和内网端口也不能重复
+        location / {
+            proxy_pass http://127.0.0.1:10081;
+        proxy_set_header X-Real-IP $remote_addr;
+        }
+}
+
+4，启动nginx服务 nginx -c /etc/nginx/nginx.conf
+
+5，此时浏览器访问10080端口报错，原因是防火墙禁止了10080端口的访问
+   iptables -L -n   查看防火墙配置情况，发现10080端口确实没被开启
+   iptables -A INPUT -p tcp --dport 10080 -j ACCEPT  用这条命令来打开10080端口的tcp访问
+   -A(往后追加)  -p(协议)  --dport(目的端口)  -j(策略)  -I(插入，后面要跟插入的位置)
+   打开后，还是不能没法访问，看原因，打开10080端口的命令在最下面，在禁止所有端口的下面
+   iptables -I INPUT 1 -p tcp --dport 10080 -j ACCEPT 用这条命令将100880端口放到第一位
+
+6，nginx iptables 已经配置好了，现在访问外网  114.67.224.92:10080  报错502
+   这是由于项目没有运行导致的
+   python todo.py &   将项目在后台运行
+   现在访问外网，成功显示 '你好 世界'
+
+7，防火墙知识
+   用iptables -L -n 命令看防火墙配置
+   防火墙的策略分三块chain input(进入的), chain output(出去的), chain forward(转发的)
+   Chain INPUT (policy DROP)，Chain FORWARD (policy DROP)，Chain OUTPUT (policy ACCEPT)
+   出去的流量是默认是允许的，进来的和转发的，默认扔掉，也就是禁止，除非下面额外说明，否则禁止
+   因为恶意攻击或者登陆都是进来的数据，出去的一般没问题
+   选项 target 有 accept, 有 drop，意思是遇到后面的情况采取的措施
+   选项 prot 有 tcp，udp，icmp，icmp 就是 ping 发出的包
+   选项 source destination 是包的源ip和目的ip，发起连接的ip是源ip，一般服务器是接收请求的，是目的ip
+   这里0.0.0.0就是没限制，dpt 就是目的端口，spt 就是源端口
+   刚才添加的这一行   ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0       tcp dpt:10080
+   target=accept，接受。什么情况下接受呢，当协议是tcp，并且ip不管什么都行，但是目的端口要是 10080，意思就是访问 10080 允许
+   第二行 ACCEPT     all  --  0.0.0.0/0     0.0.0.0/0   貌似是全部允许，这里没有显示全
+   用命令 iptables -L -v -n 查看，会发现in选项是lo lo表示本机，和外网没关系，所以防火墙不禁止
+   最后一句  REJECT     all  --  0.0.0.0/0            0.0.0.0/0       reject-with icmp-host-prohibited
+   这句话的意思是禁止将所有的丢掉，刚开始的时候，加到了这条之后，所以不起作用
+   
+   
+
+
+三，nginx反向代理 uwsgi
+
+1，python代码
+
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+from bottle import route, run, static_file,request
+import bottle
+
+app = application = bottle.Bottle()
+@app.route('/')
+def todo():
+        return '你好，世界'
+
+class StripPathMiddleware(object):
+
+    def __init__(self, a):
+        self.a = a
+    def __call__(self, e, h):
+        e['PATH_INFO'] = e['PATH_INFO'].rstrip('/')
+        return self.a(e, h)
+
+if __name__ == '__main__':
+    bottle.run(
+        app=StripPathMiddleware(app),
+        reloader=True,
+        )
+
+2，admin.conf配置
+# vim /etc/nginx/conf.d/admin.conf
+# 如果不写第二个location，访问域名端口时会提示nginx成功运行
+
+server {
+        listen                   10080;
+        server_name 114.67.224.92;
+
+        location / {
+          try_files $uri @uwsgi;
+        }
+
+        location @uwsgi {
+            include uwsgi_params;
+            uwsgi_pass 127.0.0.1:10081;
+        }
+}
+
+
+3，编辑uwsgi配置文件
+# uwsgi有多种形式的配置文件，一般常用的是.ini文件
+# uwsgi --help 关于配置不懂的，可以自己查询
+# vim /etc/uwsgi/apps-available/bottle.ini
+
+[uwsgi]
+# 项目的地址和端口号，这个需要和nginx里面的一直
+socket= 127.0.0.1:10081
+# 指定运行目录
+chdir = /home
+# 允许主进程存在
+master = true
+# 加载的插件
+plugins = python
+# 文件
+file = todo.py
+# 指定用户
+uid = root
+# 指定组
+gid = root
+
+4，做一个软链接，因为available中是不能生效的，enabled才能生效
+ln -s /etc/uwsgi/apps-available/bottle.ini /etc/uwsgi/apps-enabled/bottle.ini
+
+5，启动nginx：nginx  -c /etc/nginx/nginx.conf
+     启动uwsgi：service uwsgi restart
+     运行python: python /home/todo.py
+     此时显示 Listening on http://127.0.0.1:8080/    浏览器显示502错误
+
+     修改python代码，将地址和端口号加上，运行结果 Listening on http://127.0.0.1:10081/
+     浏览器访问http://114.67.224.92:10080/  显示502错误 python 报错 code 400, message Bad request syntax
+     修改nginx和uwsgi配置，将端口改成8080，结果显示502错误 python 报错 code 400, message Bad request syntax

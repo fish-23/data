@@ -1,0 +1,123 @@
+﻿1，版本控制
+  （1）集中式版本控制系统(cvs,svn)
+       版本库是集中存放在中央服务器的，而干活的时候，用的都是自己的电脑，所以要
+       先从中央服务器取得最新的版本，然后开始干活，干完活了，再把自己的活推送给
+       中央服务器，受网速影响很大
+  （2）分布式版本控制系统(git)
+       分布式版本控制系统根本没有“中央服务器”，每个人的电脑上都是一个完整的版
+       本库，这样，你工作的时候，就不需要联网了，因为版本库就在你自己的电脑上。
+       既然每个人电脑上都有一个完整的版本库，那多个人如何协作呢？比方说你在自己
+       电脑上改了文件A，你的同事也在他的电脑上改了文件A，这时，你们俩之间只需把
+       各自的修改推送给对方，就可以互相看到对方的修改了。
+
+2，安装配置
+  （1）安装：sudo apt-get install git    yum install git
+  （2）配置：git config --global user.name "fish"  (设置用户名)
+                    git config --global user.email "353142832@qq.com"  (设置邮箱地址)
+                    git config --global color.ui true   (输出显示颜色)
+                    git config --global alias.st status  (设置别名，设置status的别名是st)
+                    vim .gitconfig  (删除别名直接在.gitconfig文件中，直接把那一行删除即可)
+
+3,  版本库，工作区和暂存区
+  （1） 版本库：可以说是一个仓库，一个目录，目录里面的所有文件都可以被Git管理起来
+  （2）git init   将一个目录变成git的仓库(需要进入目录后使用命令)
+  （3）版本控制系统只能管理txt,代码,网页等。图片,视频,Word等二进制文件是没法管理的
+  （4）用git init处理后的目录里面会生成一个 .git的文件夹，这个目录是工作区，这个.git文件夹就是git的版本库
+  （5）版本库中最重要的就是暂存区(stage)，分支(master)，和一个指针HEAD
+  （6）git add把文件添加进去，实际上就是把文件修改添加到暂存区
+  （7）git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支，没在暂存区的修改不会被提交
+  （8）git管理的是文件的修改，而不是文件的备份
+
+4，文件修改
+  （1）git add  将文件添加到仓库
+       eg：git add 1.txt  2.txt    将1.txt添加到仓库
+       eg：git add *  将工作区的所有文件添加到仓库
+  （2）git commit  将添加的文件进行提交  
+               -m(提交说明,对本次提交进行备注)  -a(将git仓库中所有有变动的文件进行提交)
+                备注：-a命令不会造成新文件被提交，只能是修改的文件
+                备注：可以一次添加多个文件后一次性提交
+        eg：git commit -m 'add 3 files'   将添加的文件进行提交
+        eg：git commit  -a -m 'change'   将git仓库中所有有变动的文件添加并提交，不需要用 git add 来添加
+  （3）git status    查看git仓库当前状态
+  （4）git diff     查看文件发生的变化
+       eg：git diff 1.txt  查看1.txt发生的变化
+
+5，版本回退
+   （1）git log   查看提交的日志(默认显示3条)
+   （2）git log --pretty=oneline   将每条日志用一行显示(方便查看)
+   （3）git reset  更换版本   HEAD(当前版本)  HEAD^(上一个版本)  HEAD~3(上第3个版本)
+         eg：git reset --hard  HEAD^  回退到上一个版本(此时看log会发现之前的那个版本不见了，可以用版本号返回)
+         备注：会回到最近一次提交的内容(如果新建了一个文件，回退上一个会删除这个文件)
+         eg：git reset --hard  c7fce   会退到版本id是c7fce的那个版本
+   （4）git reflog  查看之前修改的所有操作(显示结果最前面就是那次修改对应的版本id)
+   （5）git checkout --   将工作区的修改全部撤销
+        eg：git checkout  --  1.txt  注意文件1.txt前面有空格
+        备注：当你把工作区的一个文件误删了，用这个命令的意思也是撤销，会把版本库里最新一次提交的内容撤销回来                                                   
+   （6）git reset HEAD 1.txt   将暂存区的文件回退到工作区
+   （7）git rm  删除版本库里的东西
+        eg：git rm 1.txt  删除版本库里1.txt (事实证明删不了，可以用 git reset --hard 版本id  进行恢复)
+
+6，分支管理
+   （1）每次提交，git都把他们连成一条线，这条线就是一个分支，其中master是主分支
+   （2）指针HEAD指向分支，假如指向主分支master，主分支master会指向每次提交
+   （3）假如现在新建了一个分支fish，git会自动创建一个指针fish，这个指针指向分支fish，HEAD指针指向指针fish
+   （4）新建分支后，每次提交，fish指针移动，master指针不动，两个分支合并，让master指向fish指针提交即可
+   （5）git checkout -b  创建并切换分支
+        eg：git checkout -b  fish  创建并指向新分支fish
+        eg：git checkout -b  dev  origin/dev    将远程的dev分支创建到本地
+   （6）git branch  列出所有分支(当前分支前面会有一个*)
+   （7）git branch fish  加了分支名表示创建分支
+   （8）git checkout   切换分支(在切换分支之前，需要把在当前分支下修改先进行提交)(在当前分支下新建分支，新分支会指向当前分支的提交)
+        eg：git checkout master  切换到master分支
+   （9）git merge  合并分支(其他分支只能对master文件进行修改或者删除，增加内容会出现冲突，其他分支保存后，master分支修改内容后合并，也会冲突)
+        eg：git merge fish     将fish分支里面的东西合并到master分支中(需要先切换到master分支，再进行合并)
+        eg：git merge fish --allow-unrelated-histories (当在master分支上合并fish分支时，报错'拒绝合并不相关的历史'  用这种方法进行合并)
+   （10）git branch -d   删除分支
+             git branch -D   强制删除(如果新建一个分支，没有合并，就需要用这个命令来删除)
+        eg：git branch -d fish   删除分支 fish
+   （11）默认情况下，Git会用Fast forward模式，禁用时用 --no-ff  在合并时会生成一个commit
+   （12）git merge --no-ff -m 'no-ff  merge' wlp    用普通模式模式合并分支
+
+7，工作环境存储
+   （1） git stash  存储当前工作现场
+   （2） git stash list  查看所有工作现场
+   （3） git stash pop 恢复工作现场并删除之前的存储
+   （4） git stash apply 只恢复工作现场
+   （5） git stash drop 只删除之前的存储
+
+8，远程仓库(远程分支)
+   （1）由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以要先创建SSH Key，先找到.ssh文件夹
+   （2）ssh-keygen -t rsa -C "353142832@qq.com" 
+           (-C是加的注释，前面的命令用于申请key)
+   （3）id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人
+   （4）登录github，在setting里面进行设置，添加时填写公钥的内容
+   （5）git remote add origin git@github.com:fish-23/git.git
+           (在本地git仓库下运行，将本地git仓库与github进行连接)
+           (添加后，远程库的名字就是origin，这是Git默认的叫法，也可以改成别的)
+   （6）git push   将本地master分支的东西推送到github远程仓库
+        eg： git push -u origin master   将本地的master推送到远程origin 主机， -u选项只在第一次推送时使用，会指定origin为默认主机
+        eg： git push origin master  以后推送可以简写
+        eg： git push origin dev   推送本地dev分支
+   （7）git clone git@github.com:fish-23/git.git
+           (将远程仓库克隆到本地，会在本地生成一个python文件夹，里面的内容是远程仓库的内容)
+           https://github.com/fish-23/python.git  第二种克隆方式，上面的推送也可以这样
+   （8）git remote 查看远程仓库信息  -v(显示详细信息)
+        eg：git remote -v    显示远程仓库详细信息 push表示推送  fetch表示抓取，如果没有哪个权限，不会显示
+   （9）git checkout -b dev origin/dev    将远程的dev分支创建到本地
+   （10）在远程仓库，多人协作开发时，同一个文件被队友修改后，你在本地将无法推送，这时候你需要将文件抓取下来修改后再进行提交
+   （11）git pull  将远程仓库中的分支抓取下来
+   （12）git branch --set-upstream-to=origin/dev dev   连接远程dev分支(抓取之前先需要连接)
+   （13）git rebase 把分叉的提交历史“整理”成一条直线看上去更直观。缺点是本地的分叉提交已经被修改过了
+
+9，标签管理 
+   （1）git tag      显示所有的标签
+   （2）git tag v1.0     给当前分支最近一次提交的内容打标签，标签名是 v1.0
+   （3）git tag v2.0  f52c633  给id是f52c633这一次提交打标签，标签名是v2.0
+   （4）git tag -a v3.0 -m 'branch dev file 1.py'   打标签并添加注释(-a后是标签名 -m后是注释)
+   （5）git show v1.0   查看v1.0的标签信息
+   （6）git tag -d v1.0  删除v1.0这个标签
+   （7）git push origin v1.0  将v1.0这个标签推送到远程仓库
+   （8）git push origin --tags  将所有的标签推送到远程仓库
+   （9）删除远程仓库标签(先删除本地标签，然后删除远程仓库标签)
+           git tag -d v1.0
+           git push origin :refs/tags/v1.0

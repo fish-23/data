@@ -1,0 +1,97 @@
+﻿#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import time,datetime,calendar
+
+# 获取当前时间（结构时间类型）
+x = time.localtime()
+print(x,type(x))
+# 获取当前时间（字符串类型）
+x = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
+print(x,type(x)) # 2018-05-21 16:37:56 <class 'str'>
+# 获取当前时间 (时间类型)
+x = datetime.datetime.now()
+print(x,type(x)) # 2018-05-21 16:37:56.168004 <class 'datetime.datetime'>
+# 获取当前年月日 (时间类型)
+x = datetime.date.today()
+print(x,type(x)) # 2018-05-21 16:37:56.168004 <class 'datetime.datetime'>
+# 获取指定日期和时间 (时间类型)
+x = datetime.datetime(2018, 5, 21, 14, 56)
+print(x,type(x))  # 2018-05-21 14:56:00 <class 'datetime.datetime'>
+
+
+# 计算机用到的标准时间是timestamp时间(也就是UTC时间，也就是时间戳)，北京时间是东八区时间，只需转化即可
+# 将当前时间转化成时间戳(int类型)
+x = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+x = time.strptime(x, "%Y-%m-%d %H:%M:%S")
+x = int(time.mktime(x))
+print(x,type(x))  # 1526892340 <class 'int'>
+# 将当前时间转化成时间戳(float类型)
+x = datetime.datetime.now()
+dt = x.timestamp()
+print(dt,type(dt))  # 1526892340.875899 <class 'float'>
+
+
+# 将时间戳转化成当前时间（字符串类型）
+dt = 1516291200
+x = time.localtime(dt)
+x = str(time.strftime("%Y-%m-%d %H:%M:%S", x))
+print(x,type(x)) # 2018-01-19 00:00:00 <class 'str'>
+# 将时间戳转化成当前时间 (时间类型)
+x = datetime.datetime.fromtimestamp(dt)
+print(x,type(x)) # 2018-01-19 00:00:00 <class 'datetime.datetime'>
+# 将时间戳转化成UTC时间 (时间类型)
+ntc = datetime.datetime.utcfromtimestamp(dt)
+print(ntc,type(ntc)) # 2018-01-18 16:00:00 <class 'datetime.datetime'>
+
+
+# 将字符串类型时间转化成时间类型（年月日时分秒）
+x = '2018-01-18 16:00:00'
+x = datetime.datetime.strptime(x,"%Y-%m-%d %H:%M:%S")
+print(x,type(x)) # 2018-01-18 16:00:00 <class 'datetime.datetime'>
+# 将时间类型转化成字符串类型 (形式一)
+s = str(x)
+print(s,type(s)) # 2018-01-18 16:00:00 <class 'str'>
+# 将时间类型转化成字符串类型 (形式二)
+s = x.strftime('%a, %b %d %H:%M')
+print(s,type(s)) # Thu, Jan 18 16:00 <class 'str'>
+
+
+# 时间计算(时间类型)
+# 一小时的时间表示
+x =datetime.timedelta(hours=1)
+print(x,type(x)) # 1:00:00 <class 'datetime.timedelta'>
+# 一天的时间表示
+x = datetime.timedelta(days=1)
+print(x,type(x)) # 1 day, 0:00:00 <class 'datetime.timedelta'>
+# 计算两天前的时间
+x = datetime.datetime.now() + datetime.timedelta(days = -2)
+x = datetime.datetime.now() - datetime.timedelta(days = 2)
+print(x,type(x)) # 2018-05-19 17:08:27.342930 <class 'datetime.datetime'>
+# 计算25个小时后的时间(就是一天零一个小时)
+x = datetime.datetime.now() + datetime.timedelta(days = 1,hours=1)
+print(x,type(x)) # 2018-05-19 17:08:27.342930 <class 'datetime.datetime'>
+# 计算两个时间间隔几天
+x = '2008-12-31'
+y = '2009-01-01'
+x = datetime.datetime.strptime(x,"%Y-%m-%d")
+y = datetime.datetime.strptime(y,"%Y-%m-%d")
+z = y-x
+print(z,type(z)) # 1 day, 0:00:00 <class 'datetime.timedelta'>
+z = str(y-x)[0]
+print(z,type(z)) # 1 <class 'str'>
+
+
+# 月份计算
+def months(dt,months):
+    month = dt.month - 1 + months
+    year = dt.year + month / 12
+    year = int(year)
+    month = month % 12 + 1
+    day = min(dt.day,calendar.monthrange(year,month)[1])
+    dt = dt.replace(year=year, month=month, day=day)
+    return(str(dt.replace(year=year, month=month, day=day)).replace('-',''))
+time_temp = '19970331'
+dt = datetime.date(int(time_temp[0:4]), int(time_temp[4:6]), int(time_temp[6:8]))
+print('1个月前的今天是',months(dt,-1))
+print('6个月前的今天是',months(dt,-6))

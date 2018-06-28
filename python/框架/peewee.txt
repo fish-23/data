@@ -1,0 +1,108 @@
+﻿# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+
+
+# 字段类型
+   name = FixedCharField()   # 字符类型char，最大存储255
+   name = CharField()        # 字符串类型varchar，最大存储65535
+   name = TextField()        # 字符串类型longtext，最大存储很大
+   name = DateTimeField()    # 日期类型
+   name = IntegerField()     # 整数类型
+   name = FloatField()       # 浮点类型
+   name = BooleanField()     # 布尔类型
+   name = CharField(default=1)        # default=1 表示创建字段的时候如果没有赋值默认成1 而不是null
+   name = CharField(null=True)        # null=True 表示这个字段可以不存储数据
+
+
+# 接收数据
+   money = web.input() 
+
+
+# 数据库增加数据
+  # 增加一条
+  Users.create(name = name, cellphone = phone)
+  # 增加多条
+  date = [
+      {name = name, cellphone = phone},
+      {name = name, cellphone = phone},
+       ...
+       ...
+       ]
+  with database.atomic():
+      Users.insert_many(date).execute()
+
+# 数据库删除数据
+  # 删除一条
+  result = Users.get(cellphone == phone)
+  result.delete_instance()
+  
+  # 删除多条(方法一)
+  Users.delete().where(cellphone < 883).execute()
+  # 删除多条(方法二)
+  result = Users.select().where(cellphone < 883)
+  result.delete_instance()
+  # 删除全部
+  Users.delete().execute()
+
+# 数据库更改数据
+  Users.update(cellphone = 890).where(Users.id == 18).execute()
+  
+  user = Users.get(Users.id == 18) 
+  cellphone = 890
+  user.cellphone = cellphone
+  user.save()
+
+# 数据库查询数据
+  # 查询一条（get）
+  user = Users.get(Users.id == 18)
+  # 查询全部数据
+  user = Users.select()
+  # 查询部分字段
+  user = Users.select(Users.id)
+  # 查询数据的条数
+  user = Users.select(Users.id).count()
+  # 有条件查询
+  user = Users.select().where(Users.id == 18)
+  # 排序查询(正序，反序)
+  user = Users.select().order_by(Users.id.asc())
+  user = Users.select().order_by(Users.id.desc())
+  # not_in组合查询
+  user = Users.get(Users.id).where(Users.id < 18)
+  userbalances = Userbalances.select().where(Users.id.not_in(user))
+  # 从表查主表数据，直接用外键查询，外键在从表中，主表查从表中剩余余额
+  # owner = ForeignKeyField(Users, related_name='owner_userbalances', on_delete='CASCADE')
+  reset = Users.select().owner_userbalances.reset
+  # 模糊查询
+  # 想要查询用户名包含 'fish' 的数据
+  result = Users.select().where(Users.name % '%fish%')
+  name = 'tom'
+  result = Users.get(Users.name % '%{}%'.format(name))
+  # 查询users表用户id是[15,16,17]，user_balances表变动金额是216的数据
+  # join()的两个model，必须是用外键连接的.
+  result = Users.select().where(Users.id << [15,16,17]).join(Userbalances).where(Userbalance.variation_balance == 216)
+  result = Users.select().where(Users.id << [15,16,17], userbalances = Userbalances.select().where(Userbalance.variation_balance == 216))
+  # 解决外键关联错误
+  store_name = Groups.select().join(Users).where(Users.id == uses_id)
+  store_name = [i.name for i in store_name1]
+  store_name = store_name[0]
+
+
+# 查询运算符
+  # <<   查询时x属于y，y是一个列表或者是一个查询
+  user = Users.select().where(Users.id << [15,16,17])
+  # >>   查询时x是y， y只能是 None/NULL
+  user = User.select().where(User.name >> None).count()
+  # &    与 查询时同时满足两个条件
+  user = Users.select().where((Users.balance == 1) & (Users.integral == 5)).count()
+  # |    或 查询时满足一个条件即可成功
+  user = Users.select().where((Users.balance == 85) | (Users.integral == 55000)).count()
+  # ~    非 查询时结果不为这个的数据
+  user = Users.select().where(~(Users.id << [15,16,17]))
+  # contains(substr)  通配符搜索子字符串
+  user = Users.select().where(Users.name.contains('fi') | Users.cellphone.contains('183'))
+  # startswith('fish')  搜索以 fish 开头的值
+  user = Users.select().where(Users.name.startswith('fish'))
+  # endswith('fish')    搜索以 fish 结尾的值
+  user = Users.select().where(Users.name.endswith('fish'))
+  # between(low, high)  搜索low和high之间的数值
+  user = Users.select().where(Users.balance.between(1,10))

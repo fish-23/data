@@ -1,0 +1,237 @@
+﻿#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+
+修改一：显示时间
+
+from bottle import route,run
+import time
+
+@route('/',method="get")
+def hello():
+	return '%s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
+run(host='',port='8080',debug=True,reloader=True)
+# @route('/'），URL装饰器，括号内为路径，/表示默认路径
+# method,请求方法，默认的是get方法
+# host,指定运行的地方，服务器运行还是本地运行
+# port,指定端口号
+# debug, 如果出错，会在命令行有错误提示
+# reloader,调试的时候修改完代码,服务会自动重启，不用一次次的关闭打开
+
+
+
+
+修改二：运用post请求处理
+
+from bottle import route,run
+import time
+
+
+htmlstr = '''
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bottle</title>
+</head>
+<body>
+<form action='/post' method='POST'>
+<input type='submit' />
+</form>
+</body>
+</html>
+'''
+@route('/')
+def hello():
+	return htmlstr
+
+@route('/post',method='POST')
+def p():
+	return '%s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) 
+
+run(host='',port='8080',debug=True,reloader=True)
+
+
+
+# <!doctype html>  <html>  <head>  <meta charset="utf-8">   <title>Bottle</title>  </head>  <body>  </body>  </html>
+# heml页面字符串
+# form为页面表单，在这个例子中加到页面字符串里面
+# <form action="/demo_post" method="POST"> 指定访问路径和访问方法
+# <input type="submit" /> 用来提交表单
+
+
+
+
+修改三：get和post请求选择
+
+from bottle import route,run,request
+import time
+
+
+htmlstr = '''
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bottle</title>
+</head>
+<body>
+<form action='/getpost' method='POST'>
+<input type='submit' />
+</form>
+</body>
+</html>
+'''
+@route('/')
+def hello():
+	return htmlstr
+
+
+@route('/getpost',method=['GET','POST'])
+def gp():
+	if request.method == 'GET':
+		return 'get time is %s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) 
+	else:
+		return 'post time is %s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
+run(host='',port='8080',debug=True,reloader=True)
+# 根目录默认请求为post，详见html表单，从主页面请求时为post请求，直接请求地址为get请求
+# http://www.cnblogs.com/hyddd/archive/2009/03/31/1426026.html
+
+
+
+修改四，添加动态路由
+
+from bottle import run,route
+
+@route('/')
+@route('/fish/<name>')
+def hello(name='lili'):
+	return 'hello %s' %(name)
+
+@route('/pathl/<pathl:path>')
+def pathl(pathl):
+	return  'path is' + pathl
+
+@route('/intl/<num:int>')
+def intl(num):
+	return 'num is %d'%(num)
+
+@route('/reg/<reg:re:[0-1]*>')
+def regl(reg):
+	return ret
+
+
+run(host='',port='8080',debug=True,reloader=True)
+
+
+# 每个动态路由的通配符(参数name)都需要在函数中声明
+# `根目录`和`fish+名字`这两个目录都会调用函数，根目录会使用默认的lili，fish目录必须有输入
+# http://blog.csdn.net/JohnnyHu90/article/details/38794513
+# 过滤器：通配符后面加上冒号和过滤这个通配符的参数，有 int，float，path(文件路径)，正则表达式
+# 正则表达式：通配符:re:[a-z]+
+# [0-1]*  检测是否为二进制数
+
+
+
+修改五， 返回静态文件
+
+from bottle import route, run, static_file, error
+
+images_path = ''
+@route('/fish/<filename:path>')
+def sta(filename):
+	return static_file(filename, root=images_path)
+
+@route('/dl/<filename:path>')
+def sta(filename):
+	return static_file(filename, root=images_path,download=True)
+
+@error(404)
+def fish(err):
+	return '<p style="color:green">找不到页面</p>'
+
+
+run(host='', port='8080', debug=True, reloader=True)
+
+# filename表示文件名，root表示文件路径，不指定路径表示文件在根目录下
+# http://127.0.0.1:8080/fish/asd.jpg   在浏览器中输入文件名就会打开，文件需要在指定路径下
+# 如果地址名过长也可以用变量来代替
+# 在函数里面加上 download=True 参数  文件会自动下载
+
+
+
+修改六，URL转向
+
+from bottle import route,run,abort,redirect,error
+
+@route('/')
+def first():
+	return '首页'
+
+@error(404)
+def fish(err):
+	return '<p style="color:green">找不到页面</p>'
+
+@route('/abo')
+def abo():
+	abort(404)
+
+@route('/re')
+def re():
+	redirect('/')
+
+
+
+run(host='', port='8080', debug=True, reloader=True)
+
+# 当访问abo页面时会触发404错误，当触发404错误后会执行他上面那个404错误的代码
+# redirect转向，当访问re页面时会跳转到后面指定的页面
+
+
+
+
+修改七，get请求 增加参数（add?a=1&b=2）
+
+from bottle import route, run, request
+
+@route('/add')
+def add():
+	a = request.query.a
+	b = request.query.b
+	print a, b
+	return 'a is ' + a + ',\n' + 'b is ' + b + '\n'
+
+run(host='', port='8080', debug=True, reloader=True)
+
+
+# http 请求其实就是客户端和服务器进行的一对一的请求，类似于，执行命令，你输入一个命令，服务器给你返回一个结果
+# get 和 post 就是客户端和服务器端相互传递信息的媒介
+# 这个 request.query 的作用，其实就是把get请求中添加的参数帮你取出来(request请求， query查询)
+# request.query.a 就是客户端发来的参数 a，也就是客户端传给服务器端的东西
+# print 的作用是把 a 和 b 打印到服务器的命令行了
+# return  的作用是把数据返回给客户端了
+# 访问 http://127.0.0.1:8080/add?a=1&b=2  会把参数1和2显示出来
+
+
+
+修改八，post请求 增加参数（add?a=1&b=2）
+
+from bottle import route, run, request
+
+@route('/add', method='post')
+def add_post():
+	a = request.forms.get('a')
+	b = request.forms.get('b')
+	return 'a is' + a + ',\n' + 'b is' + b 
+
+run(host='', port='8080', debug=True, reloader=True)
+
+
+
+# 一般来说，get 是给浏览器显示页面的，所以都是 html 协议
+# Post 是传输数据的，所以什么格式都可以
+# Post 之后，要指示浏览器跳到另外一个 get, 不然显示就不对了
+
+# 'a=1&b=2' 127.0.0.1:8080/add

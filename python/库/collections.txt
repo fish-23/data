@@ -1,0 +1,71 @@
+﻿# collections(集合模块)
+
+# namedtuple
+# namedtuple函数继承自tuple，它创建了一个和tuple类似的对象，而且对象拥有可访问的属性
+import collections
+# 定义一个namedtuple类型User，并包含name，sex和age属性。
+User = collections.namedtuple('User', ['name', 'sex', 'age'])
+# 创建一个User对象，并用x指向这个对象
+x = User(name='tom', sex='male', age=21)
+print(x) # User(name='tom', sex='male', age=21)
+print(x.name) # tom
+# 修改对象属性，注意要使用"_replace"方法
+x = x._replace(age=10)  
+print(x)  # User(name='tom', sex='male', age=10)
+# 定义坐标
+Point = collections.namedtuple('Point', ['x', 'y'])
+p = Point(1, 2)
+print(p) # Point(x=1, y=2)
+
+# deque(高效插入删除)
+# deque是为了高效实现插入和删除操作的双向列表，适合用于队列和栈
+# deque除了实现list的append()和pop()外，还支持appendleft()和popleft()
+x = collections.deque(['a', 'b', 'c'])
+x.append('2')
+x.appendleft('1')
+print(x,type(x))  # deque(['1', 'a', 'b', 'c', '2'])  <class 'collections.deque'>
+print(list(x))    # ['1', 'a', 'b', 'c', '2']
+
+# defaultdict 定义一个字典，当字典的键不存在时，会返回一个默认值，参数：一个函数
+dic = collections.defaultdict(lambda: 'err')
+dic['a'] = 1
+print(dic['a']) # 1
+print(dic['b']) # err
+
+# OrderedDict(有序字典) 
+# 字典的key是无序的，在对dict做迭代时，我们无法确定Key的顺序，用这个方法创建的字典就是有序字典
+# OrderedDict的Key会按照插入的顺序排列，不是Key本身排序
+x = [('z', 1), ('b', 3), ('f', 5)]
+dic = collections.OrderedDict(x)
+print(dic,type(dic))  # OrderedDict([('z', 1), ('b', 3), ('f', 5)]) <class 'collections.OrderedDict'>
+dic['d'] = 2
+print(dic)  # OrderedDict([('z', 1), ('b', 3), ('f', 5), ('d', 2)])
+dic_2 = dict([('z', 1), ('b', 3), ('f', 5)])
+dic_2['d'] = 2
+print(dic_2)  # {'z': 1, 'b': 3, 'f': 5, 'd': 2}
+for i in dic:
+    print(i)
+for j in dic_2:
+    print(j)
+
+# Counter(计数器)
+c = collections.Counter()                         # 创建一个新的空counter
+print(c) # Counter()
+c = collections.Counter('abcasdf')                # 一个迭代对象生成的counter  # 统计字母出现的次数
+print(c) # Counter({'a': 2, 'b': 1, 'c': 1, 's': 1, 'd': 1, 'f': 1})
+c = collections.Counter({'red': 4, 'yello': 2})   # 一个映射生成的counter
+print(c) # Counter({'red': 4, 'yello': 2})
+c = collections.Counter(cats=2, dogs=5)           # 关键字参数生成的counter
+print(c) # Counter({'dogs': 5, 'cats': 2})
+# elements() 按照counter的计数，重复返回元素
+x = collections.Counter(a=3, b=1, c=0, d=-2)
+x = x.elements()
+print(list(x)) # ['a', 'a', 'a', 'b']
+# most_common(n) 按照counter的计数，按照降序，返回前n项组成的list; n忽略时返回全部
+x = collections.Counter('abracadabra').most_common(3)
+print(x)  # [('a', 5), ('b', 2), ('r', 2)]
+# subtract()  counter按照相应的元素，计数相减
+x = collections.Counter(a=4, b=2, c=0, d=-2)
+y = collections.Counter(a=1, b=2, c=3, d=4)
+x.subtract(y)
+print(x) # Counter({'a': 3, 'b': 0, 'c': -3, 'd': -6})

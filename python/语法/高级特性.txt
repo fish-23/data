@@ -1,0 +1,82 @@
+﻿# 高级特性
+
+# 切片
+x = [1,2,3,4]
+print(x[1:3])   # [2,3]  # 取第二和第三个元素
+print(x[-2:-1]) # [3]    # 取倒数第二个元素
+print(x[-1:])    # [4]    # 取倒数第一个元素 
+
+# 迭代
+# 我们可以通过for循环来遍历列表和元组，这种遍历我们称之为迭代 
+# 可以用Iterable来判断一个对象是不是可迭代对象
+from collections import Iterable
+print(isinstance('123', Iterable))     # True
+print(isinstance([1,2,3], Iterable))   # True
+print(isinstance(123, Iterable))       # False
+# enumerate()函数可以列出数据和数据下标  参数：序列，可迭代对象   返回：枚举对象
+print(list(enumerate(['A', 'B', 'C'])))  # [(0, 'A'), (1, 'B'), (2, 'C')]
+
+# 列表生成式
+x = list(range(1,6))
+print(x)  # [1,2,3,4,5]
+x = [i*i for i in range(1,6)]	
+print(x)  # [1,4,9,16,25]
+x = [i*i for i in range(1,6) if i%2 == 0]
+print(x)  # [4,16]
+x = [i+j for i in 'ab'  for j in 'cd']
+print(x)  # ['ac','ad','bc','bd']
+
+# 生成器(generator)
+# 一边循环一边计算的机制，称为生成器。生成器中保存的是算法，通过next()和for循环可以计算出算法的值
+# 创建方法一，类似列表生成式
+g = (i*i for i in range(1,6))
+print(g) # <generator object <genexpr> at 0x7f19042df360>
+for j in g:
+	print(j) # 1 4 9 16 25
+# 创建方法二，函数
+# 斐波拉契数列：其实也是一个算法，根据输入，会计算出对应的数值
+def fish(num):
+	a,b,n = 0,1,0
+	while n < num:
+		print(b)
+		a,b = b,a+b
+		n += 1
+	return('end')
+for i in fish(6):
+	print(i) # 1 1 2 3 5 8 e n d
+# 将上面函数的 print(b) 改成 yield b 就是一个生成器
+# 生成器和函数不同的地方，函数是碰到return会中断，而生成器遇到 yield 会中断，中断后接着执行，直到报错停止，得不到return的值
+def fish(num):
+	a,b,n = 0,1,0
+	while n < num:
+		yield b
+		a,b = b,a+b
+		n += 1
+	return('end')
+for i in fish(6):
+	print(i) # 1 1 2 3 5 8
+	
+# 迭代器(Iterator)
+# 可迭代对象(Iterable)：可以直接作用于for循环的对象统称为可迭代对象
+# 迭代器(Iterator)：可以被next()函数调用并不断返回下一个值的对象称为迭代器
+# 迭代器对象表示的是数据流，永远不知道其长度，只能通过next()来计算
+from collections import Iterable
+from collections import Iterator
+print(isinstance([], Iterable))   # True
+print(isinstance([], Iterator))   # Falus
+print(isinstance({}, Iterable))   # True
+print(isinstance({}, Iterator))   # Falus
+print(isinstance('abc', Iterable))  # True
+print(isinstance('abc', Iterator))  # Falus
+print(isinstance((x for x in range(10)), Iterator)) # True
+# 迭代器是可迭代对象，可迭代对象不一定是迭代器，生成器是也是迭代器
+# 可迭代对象可以通过 iter() 函数转换成迭代器
+print(isinstance(iter([]), Iterator))  # True
+# 迭代器为什么用list()能取出值？？？
+x = [1,2,3]
+y = iter(x)
+print(y)  # <list_iterator object at 0x7f9ec71fdf60>
+print(list(y))  # [1, 2, 3]
+print(tuple(y)) # ()
+print(set(y))   # set()
+

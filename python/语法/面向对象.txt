@@ -1,0 +1,62 @@
+﻿# 面向对象(oop)
+# 面向对象的程序设计：计算机程序视为一组对象，程序执行就是消息在对象间的传递
+# 类(属性和方法的集合)，类名(Ocean，类名通常是大写开头的单词)，(object)表示该类是从哪个类继承下来的
+# 类的属性(定义在函数外面的变量，也就是变量i)，类的方法(函数fish),   
+# 对象(也就是类的实例)(类里面的属性和方法)，实例化(创建类对象的过程)
+# 创建类实例 类名+()， Ocean()就表示创建的类实例
+# 有了__init__方法，在创建实例的时候，就不能传入空的参数了，必须传入与__init__方法匹配的参数
+# x是一个指针，指向类的实例  
+# __init__方法的第一个参数永远是self，表示创建的实例本身
+# 和普通的函数相比，类中的函数只有一点不同，就是第一个参数永远是实例变量self，并且，调用时，不用传递该参数 
+# 类是创建实例的模板，而实例则是一个一个具体的对象，各个实例拥有的数据都互相独立，互不影响
+# 方法就是与实例绑定的函数，和普通函数不同，方法可以直接访问实例的数据
+class Ocean(object):
+    i = 123
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def fish(self):
+        print('name is:', self.name)
+    def f(self):
+        print('I am ocean')   	
+x = Ocean('tom',23)
+print(x.name) # tom
+x.fish()   # name is: tom
+x.name = 'lisa' 	
+print(x.name) # lisa
+# 如果要让内部属性不被外部访问，可以把属性的名称前加上两个下划线__
+# 这样，从外部就没法直接改内部的值了，虽然不能直接访问，但是可以通过方法来访问
+class Ocean2(object):
+    i = 123
+    def __init__(self, name, age):
+        self.__name = name
+        self.__age = age
+    def fish(self):
+        print('name is:', self.__name)   	
+x = Ocean('tom',23)
+x.fish() # name is: tom
+# print(x.__name) # 'Ocean' object has no attribute '__name'
+
+# 继承
+# 继承最大的好处是子类获得了父类的全部功能，并且可以对父类进行扩充
+# 当子类和父类有相同的方法时，会以子类的方法为准
+class Sea(Ocean):
+    def fish2(self):
+        print('123')
+    def f(self):
+        print('I am sea')
+y = Sea('dog',5)
+y.fish()  # name is: dog
+# 每定义一个类，实际上也可以说定义了一种数据类型(类似列表，字典)
+# 子类继承了父类，所以子类的数据类型即是子类的类型，也是父类的类型
+print(isinstance(x, Ocean))  # True
+print(isinstance(x, Sea))    # False
+print(isinstance(y, Ocean))  # True
+print(isinstance(y, Sea))    # True
+
+#types模块中的常量，可以判断一个对象是不是函数
+import types
+print(type(fish)==types.FunctionType)   # 判断是否是函数
+print(type(abs)==types.BuiltinFunctionType) # 判断是否是内建函数
+print(type(lambda x: x)==types.LambdaType)  # 判断是否是隐藏函数
+print(type((x for x in range(10)))==types.GeneratorType) # 判断是否是生成器

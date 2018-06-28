@@ -1,0 +1,25 @@
+﻿# base64(二进制流处理)
+# base64编码是将二进制字节流编码为可打印的64个字符，是一种最常见的二进制编码方法
+# base64是将原先的二进制字节流以6位为分割，然后在经过base64字符编码对照表，编码为可打印的字符串
+# 作用：在网络间传输二进制流，可用于加密
+# base64编码四个字符一组，如果不够，会用等号来填补
+import base64,os
+x = b'z'
+y = base64.b64encode(x)
+print(y)  # b'eg=='
+# 标准的Base64编码后可能出现字符+和/，"url safe"的base64编码，就是把字符+和/分别变成-和_
+x = b'i\xb7\x1d\xfb\xef\xff'
+w = x.decode('utf-8', errors='ignore')
+print(w)  # i
+y = base64.b64encode(x)
+print(y)  # b'abcd++//'
+z = base64.urlsafe_b64encode(x)
+print(z)  # b'abcd--__'
+
+# 用base64可以将前端传的二进制流保存成图片
+# 假设x为图片二进制流
+x = b'aaaaaaa'
+y = base64.b64decode(x + '='*(4-len(x)%4))
+file=open('/home/fish/1.jpg','wb')
+file.write(y)
+file.close()

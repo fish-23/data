@@ -1,0 +1,140 @@
+﻿# 进程和线程
+# 进程：像打开一个记事本这样的称为打开了一个进程
+# 线程：一个进程可能会有多个任务，这多个任务称为线程
+
+# 进程
+# fork()创建单进程
+# os.fork() 返回两个数，在父进程中返回子进程的id，在子进程中返回0
+# os.getpid() 返回当前的进程号
+import  os
+print('当前的进程号：',os.getpid()) 
+pid = os.fork()
+if pid == 0:
+    print('pid == 0,在子进程中返回的数据')
+    print('子进程进程号： (%s)，父进程进程号： %s.' % (os.getpid(), os.getppid()))
+else:
+    print('pid != 0,在父进程中返回的数据')
+    print('当前进程(%s) ，子进程: (%s).' % (os.getpid(), pid))
+    
+# Process()创建一个进程
+# p=Process() 用于生成一个进程，两个参数，target后跟一个函数，作用指定进程的操作，args用来指定进程名
+# start()方法，启动进程
+# join()方法，等待子进程执行完然后接着执行
+from multiprocessing import Process
+import os
+def run_proc(name):
+    print('进程名：%s， 进程号：(%s)' % (name, os.getpid()))
+if __name__=='__main__':
+    print('当前进程：%s' % os.getpid())
+    p = Process(target=run_proc, args=('text',))
+    print('第一个子进程text1')
+    p.start()
+    p.join()
+    print('第一个进程结束')
+    p = Process(target=run_proc, args=('text',))
+    print('第二个子进程text2')
+    p.start()
+    p.join()
+    print('第二个进程结束')
+ 
+# Pool(进程池)，创建多个进程
+from multiprocessing import Pool
+import os, time
+def run(name):
+    print('进程名：%s， 进程号：(%s)' % (name, os.getpid()))
+if __name__=='__main__':
+    print('start')
+    p = Pool(4) # 创建进程池，有四个进程
+    for i in range(4):
+        # apply_async，两个参数，一个函数用来处理进程，一个命名,调用一次，处理一次
+        p.apply_async(run, args=(i,))  
+    p.close() # 执行后不能添加新进程
+    p.join()  # 等待子进程执行完然后接着执行
+    print('end')
+    
+# 进程间通信(同步技术)
+# 几个进程，每个进程到一定的地方，要停下来等待别的进程
+# Queue.qsize()：返回当前队列包含的消息数量
+# Queue.empty()：如果队列为空，返回True，反之False
+# Queue.full()：如果队列满了，返回True,反之False
+# Queue.get_nowait()：相当Queue.get(False),取不到值时触发异常：Empty
+# Queue.put_nowait():相当于Queue.get(False),当队列满了时报错：Full
+import time
+from multiprocessing import Process,Queue
+q = Queue()  # 创建列队，不传数字表示列队不限数量
+def A():
+    for i in [1,2,3,4]:
+        q.put(i) # Queue.put():将一个值添加进数列，可传参超时时长
+        print('我是进程A，我存了一个数字: %s'%i)
+        time.sleep(0.1) # 用于进程同步
+def B():
+    while True:
+        # Queue.get():获取队列中的一条消息，然后将其从列队中移除，可传参超时时长
+        num = q.get() # 使用这个函数时，当队列中没有东西，程序会卡住，光标一直闪烁
+        print('我是进程B，我取了一个数字: %s'%num)
+        time.sleep(0.1)
+p1 = Process(target = A)
+p2 = Process(target = B)
+p1.start()
+p2.start() #start()方法，启动进程
+p1.join() # join()方法，等待子进程执行完然后接着执行
+p2.terminate()  # 用于杀死进程，当第一个进程运行结束时，会杀死后面的进程，程序结束
+
+# 线程
+# threading.Thread(),创建一个线程，两个参数，target后跟一个函数，作用指定进程的操作，name=用来指定进程名,args用来传参
+# current_thread()，返回当前的线程对象
+import time, threading
+def loop():
+    print('当前线程的名字：%s' % threading.current_thread().name)
+    print('%s 线程运行结束' % threading.current_thread().name)
+print('当前线程的名字：%s' % threading.current_thread().name)
+t = threading.Thread(target=loop, name='LoopThread')
+t.start()
+t.join()
+print('%s 线程运行结束' % threading.current_thread().name)
+
+# 线程锁
+# 为了保证线程一个个运行，需要用线程锁来限制
+import time, threading
+balance = 0
+lock = threading.Lock()
+def change_it(n):
+    print('我是线程：%s'%threading.current_thread().name)
+    global balance
+    balance = balance + n
+    balance = balance - n
+    print('处理完成，结果是%d'%balance)
+def run_thread(n):
+    lock.acquire() # 获取锁   
+    try:
+        change_it(n)
+    finally:
+        lock.release() # 释放锁
+t1 = threading.Thread(target=run_thread, args=(3,),name='Threadone')
+t2 = threading.Thread(target=run_thread, args=(9,),name='Threadtwo')
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+
+# 全局变量锁
+import threading
+# 创建全局ThreadLocal对象:
+local_school = threading.local()
+def process_thread(name):
+    # 绑定ThreadLocal的student:
+    local_school.student = name
+    process_student()
+def process_student():
+    # 获取当前线程关联的student:
+    std = local_school.student
+    name = threading.current_thread().name
+    print('线程是：%s，变量是：%s'%(name,std))
+t1 = threading.Thread(target= process_thread, args=('Alice',), name='Thread-A')
+t2 = threading.Thread(target= process_thread, args=('Bob',), name='Thread-B')
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+# 多进程模式:稳定性高,创建进程的代价大,同时运行的进程数也是有限的
+# 多线程模式:稳定性差，效率高

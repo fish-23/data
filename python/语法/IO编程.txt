@@ -1,0 +1,141 @@
+﻿# IO编程
+# IO在计算机中指Input/Output，也就是输入和输出。接收，取，得到是输入，返回，反溃是输出
+# 同步IO：cpu输出100M数据，存入磁盘，当磁盘存储的时候，cpu停止工作，代码停止运行，直到存储完毕，然后接着进行
+# 异步IO：cpu输出100M数据，存入磁盘，当磁盘存储的时候，cpu继续工作，后续代码继续执行
+# 同步和异步的区别就在于是否等待IO执行的结果
+ 
+# 文件读写
+# 操作不同不允许程序直接操作磁盘，想要 操作磁盘，必须让程序访问操作系统的接口
+# 读文件
+# open(路径及文件名，标识符)，用于打开一个文件
+# r(只读) w(只写) a(追加，指针在文件末尾) r+(用于读写，文件若不存在就报错), w+(用于读写,文件若不存在就创建)
+# a+(可追加可写，文件若不存在就创建）rb(二进制只读)，后面加上b表示二进制文件
+# read()方法用于读取文件内容, read(字节数) 可以读取规定字节数的内容(包含空格)
+# close()用于关闭打开的文件
+f = open('./1.py','r')
+print(f.read(21))
+f.close()
+# 由于打开文件时会出错，当出错时将无法关闭文件。
+# 为了保证无论是否出错都必须关闭文件，我们需要用with语句来自动帮我们调用close()方法
+with open('./1.py','r') as f:
+    print(f.read(21))
+# readline()可以每次读取一行内容，readlines()一次读取所有内容并按行返回list
+with open('./1.py','r') as f:
+    print(f.readline())
+# strip() 方法用于移除字符串头尾指定的字符（默认为空格）
+with open('./1.py','r') as f:
+    for line in f.readlines():
+        print(line.strip())
+# 要读取非UTF-8编码的文本文件，需要给open()函数传入encoding参数，例如，读取GBK编码的文件
+# errors='ignore' 表示忽略错误编码
+# f = open('./1.txt', 'r', encoding='gbk',errors='ignore')   print(f.read())
+# 写文件
+# write() 用于写入,这样会把这个文件里面之前的内容删除
+with open('./1.py', 'w') as f:
+    f.write('#!/usr/bin/env python3') 
+# append() 用于追加，在源文件后面追加
+with open('./1.py', 'a') as f:
+    f.write('# -*- coding: utf-8 -*-') 
+
+# StringIO(在内存中读写字符串)
+# getvalue()方法用于获得写入后的str
+from io import StringIO
+f = StringIO()
+f.write('hello word!')
+print(f.getvalue())   # hello word!
+# BytesIO(操作内存中的二进制数据)，实现了在内存中读写bytes类型
+from io import BytesIO
+f = BytesIO()
+f.write('中文'.encode('utf-8'))
+print(f.getvalue())  # b'\xe4\xb8\xad\xe6\x96\x87'
+
+# 操作文件和目录
+# 操作系统的目录文件操作封装在os模块和os.path模块中
+import os
+print(os.name) # posix  # 操作系统类型，posix表示Linux，nt表示Windows
+print(os.uname()) # 查看操作系统详情
+print(os.environ) # 查看环境变量的配置情况
+# 目录
+print(os.path.abspath('.'))  # /home/fish  # 查看当前目录的路径
+print(os.path.join('/home/fish', 'sea'))  # 新目录的完整路径表示出来
+print(os.mkdir('/home/fish/sea'))  # 在当前目录下创建目录 sea 如果目录存在会报错
+print(os.rmdir('/home/fish/sea'))  # 删除目录
+# 合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作
+print(os.path.split('/home/fish/1.py'))   # ('/home/fish', '1.py')  # 用于拆分路径，后一部分总是最后级别的
+print(os.path.splitext('/home/fish/1.py'))  # ('/home/fish/1', '.py')   # 获得文件扩展名
+# 文件
+# print(os.rename('test.txt', 'test.py'))  # 对文件进行重命名
+# print(os.remove('test.py'))  # 删除文件
+print([x for x in os.listdir('.') if os.path.isdir(x)])  # 列出当前路径下的目录
+print([x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py']) # 列出当前目录下的py文件
+
+# 序列化
+# 序列化：变量从内存中变成可存储或传输的过程称之为序列化
+# 反序列化:变量内容从序列化的对象重新读到内存里称之为反序列化
+# 一个程序运行，变量对应的值会存在内存中，要把这些值存在磁盘上，就必须对这些值进行序列化处理，处理完成之后才能存到内存中
+
+# pickle模块来实现序列化
+# pickle.dumps()方法把任意对象序列化成一个bytes类型
+import pickle
+x = [1,2,3]
+pickle.dumps(x) 
+# pickle.dump()直接把对象序列化后写入一个file-like Object 
+# 像open()函数返回的这种有个read()方法的对象，在Python中统称为file-like Object
+with open('1.txt', 'wb') as f:
+    y = pickle.dump(x, f)  
+# pickle.load()方法从一个file-like Object中直接反序列化出对象    
+f = open('1.txt', 'rb')
+d = pickle.load(f)  
+f.close()
+print(d) # [1,2,3]
+
+# json模块提供了Python对象到JSON格式的转换
+# json.dumps()方法返回一个str，内容就是标准的JSON，实现了python到json数据类型的转化
+import json
+dic = dict(name='Bob', age=20, score=88)    
+d = json.dumps(dic) 
+print(d)  # '{"name": "Bob", "age": 20, "score": 88}'
+# dump()方法可以直接把JSON写入一个file-like Object
+with open('1.txt', 'w') as f:
+    y = json.dump(d, f)   
+# json.load()方法或者json.load()方法，可以从一个file-like Object中直接反序列化出对象
+# 将json格式转化成python格式
+d = '{"age": 20, "score": 88, "name": "Bob"}'
+dic = json.loads(d)
+print(dic)  # {'age': 20, 'score': 88, 'name': 'Bob'}
+print('111111111111111111111111')
+
+# json 进阶
+# python的基础类型，字典，列表，字符串，整数，浮点数，布尔值可以直接用json.dumps()转化成json格式
+# 定义的类本身也是一种数据类型，这种数据类型不能直接转化成json格式，需要将他们转化成基础类型才可以
+# json.dumps()方法 除了有一个必须的参数外，还有很多可选参数
+# 可选参数default就是把任意一个对象变成一个可序列为JSON的对象，default后面跟着一个转化的函数
+import json
+class Sea(object):
+    def __init__(self, name, age, score):
+        self.name = name
+        self.age = age
+        self.score = score
+x = Sea('Bob', 20, 88)
+
+def fish(std):
+    return{
+           'name': std.name,
+           'age': std.age,
+           'score': std.score
+           }
+y = json.dumps(x, default=fish)
+print(y)  #  {"name": "Bob", "age": 20, "score": 88}
+# json.loads() 反序列同理
+# object_hook 的意思是，json.loads()先把y处理成反序列后的结果，object_hook将这个结果，反给他后面的函数
+# 在函数fish2中，wwwwd就代表这个处理后的结果，return是取这个结果的name，age，score，所以要用wwwwd['name']这样的形式来取
+# 在dict2student中 d就代表这个结果
+def fish2(wwwwd):
+    return Sea(wwwwd['name'], wwwwd['age'], wwwwd['score'])
+def dict2student(d):
+    return Sea(d['name'], d['age'], d['score'])
+y = '{"name": "Bob", "age": 20, "score": 88}'
+z = json.loads(y, object_hook=dict2student)
+print(z)
+w = json.loads(y, object_hook=fish2)
+print(w)

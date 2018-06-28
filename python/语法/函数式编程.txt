@@ -1,0 +1,128 @@
+﻿# 函数式编程
+
+# 我们通过把大段代码拆成函数，通过一层一层的函数调用，就可以把复杂任务分解成简单的任务，这种分解可以称之为面向过程的程序设计
+# 函数式编程特点：允许把函数本身作为参数传入另一个函数，还允许返回一个函数
+# 高阶函数：把函数作为参数传入，这样的函数称为高阶函数
+# 高阶函数除了可以接受函数作为参数外，还可以把函数作为结果值返回
+
+# map() 参数：函数，可迭代对象  返回：迭代器  过程：用每个可迭代对象分别用函数处理，处理后的结果生成一个迭代器
+def fish(x):
+	return(x*x)
+x = map(fish,list(range(1,6)))
+print(x)  # <map object at 0x7f1ac23c6860>
+print(list(x))  # [1, 4, 9, 16, 25]
+print(list(map(str,[1,2]))) # ['1','2']
+
+# reduse() 参数：函数，可迭代对象  返回：最终结果  过程：前两个可迭代对象用函数处理，处理后的结果再和下一个迭代对象用函数处理
+from functools import reduce
+def fish(x, y):
+    return x * 10 + y
+z = reduce(fish, [1, 3, 5, 7, 9])
+print(z) # 13579
+
+# filter() 参数：函数，可迭代对象  返回：迭代器  过程：根据函数筛选相应的值
+def fish(x):
+    return int(x)%2==0
+z = filter(fish,'12345')
+print(z) # <filter object at 0x7f7379dc2940>
+print(list(z)) # ['2', '4']
+
+# sorted() 参数：可迭代对象，key(对数据的处理方法)，reverse(reverse=True降序，reverse=False升序(默认))
+         # 返回：排序结果   过程：排序
+# abs()  返回数字的绝对值
+x = sorted([36, 5, -12, 9, -21], key=abs)
+y = sorted([36, 5, -12, 9, -21], key=abs, reverse=True)
+print(x) # [5, 9, -12, -21, 36]   
+print(y) # [36, -21, -12, 9, 5]     
+         
+# 返回函数
+# 下面的函数，fish是函数名，是一个指针，指向函数名所对应的函数。fish()是调用函数
+# 声明函数和声明变量很类似，在函数里面声明函数和局部变量很类似
+# 如果一个函数返回值是一个函数，那么这个内部函数，会引用外部函数的参数和局部变量
+# 闭包：外部函数返回内部函数时，内部函数会保存外部函数的相关参数和变量
+def fish(lis):
+    print('111')
+    p = 888
+    def fish2():
+        print('222')
+        print(p)
+        print(lis)
+        return('333')
+    def fish3():
+        print('555')
+        return('666')
+    print('777')
+    return(fish2)
+x = fish([1,2,3])
+print(x) # 111  777  <function fish.<locals>.fish2 at 0x7f85936aeea0>
+y = x()
+print(y) # 222  888  [1, 2, 3]  333
+q = fish
+print(q([1,2,3])) #  111  777  <function fish.<locals>.fish2 at 0x7f85936aeea0>
+# w = fish2  print(w())  # NameError: name 'fish2' is not defined
+# 下面函数过程，执行count()函数，先创建一个空列表，然后执行for循环，根据循环条件，共执行三次
+# 每一次，都会创建一个函数，并把指向这个函数的指针存到列表中，执行三此后，列表中存了三个指针，最后返回列表
+# 特别注意，函数f(),返回的是i*i,当count()执行完时，i已经是3了，这时候调用函数，无论调用的函数指向哪个内存，返回都是9
+# 因为返回的是i*i，和对应的内存无关
+# 如果把fs.append(f) 改成fs.append(f()) 就正确了，这个时候是当时就调用
+def count():
+    fs = []
+    for i in range(1, 4):
+        print('i = '+str(i))
+        def f():
+            return i*i
+        fs.append(f)
+    return fs
+f1, f2, f3 = count() # 这个赋值表示，调用一次函数，将结果赋给三个变量
+print(f1)  # <function count.<locals>.f at 0x7fe37f2fa840>
+print(f2)  # <function count.<locals>.f at 0x7fe37f2fa8c8>
+print(f3)  # <function count.<locals>.f at 0x7fe37f2fa950>
+print(f1()) # 9
+print(f2()) # 9
+print(f3()) # 9
+# 解决上面i的问题，这个时候i是当时就调用
+def count():
+    def f(j):
+        def g():
+            return j*j
+        return g
+    fs = []
+    for i in range(1, 4):
+        fs.append(f(i)) # f(i)立刻被执行，因此i的当前值被传入f()
+    return fs
+f1, f2, f3 = count() # 这个赋值表示，调用一次函数，将结果赋给三个变量
+print(f1)  # <function count.<locals>.f at 0x7f0f166e2840>
+print(f2)  # <function count.<locals>.f at 0x7f0f166e28c8>
+print(f3)  # <function count.<locals>.f at 0x7f0f166e2950>
+print(f1()) # 1
+print(f2()) # 4
+print(f3()) # 9
+    
+# 匿名函数
+# 关键字lambda表示匿名函数，冒号前面的x表示函数参数，后面是函数体
+# 匿名函数有个限制，就是只能有一个表达式，不用写return，返回值就是该表达式的结果
+f = lambda x: x * x
+print(f)  # <function <lambda> at 0x7efcc1a55a60>
+print(f(2))  # 4
+f = list(map(lambda x: x * x, [1, 2, 3]))  
+print(f)  # [1, 4, 9]
+# 匿名函数还可以作为返回值返回
+def fish(x,y):
+    return lambda: x+y
+print(fish(1,2)())  # 3  #调用fish的结果是返回一个函数，需要再一次调用，才可以显示返回函数的结果
+    
+# 装饰器(decorator) 
+# 定义一个函数fish(),现在想要增强这个函数的功能，但是又不想改变函数本身，这种在代码运行期间动态增加功能的方式，称之为“装饰器”
+# 高阶知识，有点难，随后看   
+    
+# 偏函数
+# 当一个函数参数过多，或者需要改变一些默认值参数时，需要生成一个新函数(就是偏函数)，可以用functools模块来解决
+# int() 函数默认的参数base=10，也就是结果是十进制，如果想要得到二进制的结果，可以用functools.partial()来创建偏函数
+# functools.partial的作用就是，把一个函数的某些参数给固定住（也就是设置默认值），返回一个新的函数
+x = int('100')
+print(x)  # 100
+import functools
+int2 = functools.partial(int, base=2) 
+x = int2('100')
+print(x)  # 4   # int2就是一个新函数，它默认的参数变成了二进制 
+

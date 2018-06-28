@@ -1,0 +1,57 @@
+﻿# 输入输出
+# 输入的类型是字符串，切记类型
+name = input('your name is:')
+print(name)
+
+# 数据类型：字符串，字典，元组，列表，整数，浮点数，布尔值
+# 在python中常量其实也是一个变量，命名的时候用大写字母，用于区分变量
+
+# 字符编码
+# ASCII编码，只包含数字，字母和少量字符，一个字符占一个字节
+# Unicode编码，包含任何语言，一个字符占两个字节
+# UTF-8编码，包含任何语言，一个字符，英文一字节，汉语三字节
+
+# ord()获取字符的整数表示， chr()将整数表示转换成字符
+print(ord('A'))   # 65
+print(ord('中'))  # 20013
+print(chr(65))    # A
+print(chr(20013)) # 中
+print('\u4e2d\u6587') # 中文  # 可以用十六制编码直接打印中文
+
+# 字符串前面加b表示bytes类型，每一个bytes类型字符占一个字节
+print('中文'.encode('utf-8'))  # b'\xe4\xb8\xad\xe6\x96\x87' # 中文只能编码成utf-8,不能编码成Unicode 
+print('ABC'.encode('ascii'))   # b'ABC'
+print(b'\xe4\xb8\xad\xff'.decode('utf-8', errors='ignore')) # 中  # 如果bytes类型代码有错误，可以用errors='ignore'来处理
+# len(字符串)，查看字符串包含多少字符，len(bytes类型),计算字节数
+print(len('ABC'))   # 3
+print(len('中文'))  # 2
+print(len(b'ABC'))  # 3
+print(len('中文'.encode('utf-8'))) # 6
+
+# 格式化字符串
+x = 'name:%s,age:%d,pai:%.2f'%('fish',25,3.1415)
+x = 'name:{0},age:{1},pai:{2:.2f}'.format('fish',25,3.1415)
+print(x)  # name:fish,age:25,pai:3.14
+
+# 字典
+dic = {'a':1,'b':2,'c':3}
+for k in dic:
+	print(k)    # a b c     # 默认情况下取出的是键
+for v in dic.values():
+    print(v)    # 1 2 3     # 取值
+for k,v in dic.items():
+    print(k,v)  # a1 b2 c3  # 取键值对
+    
+# set 只存键不存值，而且存的键不能重复  输入：列表   输出：只包含键的字典
+x = set([3,1,2,3,3,2,])
+y = set([5,1,1,6,6])
+print(x)    # {1,2,3}
+print(x|y)  # {1,2,3,5,6}
+
+# 可变对象处理后，原对象会发生改变，不可变对象处理后，原对象不变
+x = [1,2,3]
+y = x.sort()    
+print(x,y)    # [1, 2, 3]  None
+x = 'abc'
+y = x.replace('a','A')
+print(x,y)   #  abc  Abc

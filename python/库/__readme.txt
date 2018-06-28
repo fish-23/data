@@ -1,0 +1,7 @@
+﻿1,   collections(集合模块)
+2,   base64(二进制流处理)
+3,   struct(bytes类型转换)
+4,   hashlib(哈希算法)  Hmac(用key强化哈希算法)
+5,   itertools(操作迭代对象)
+6,   urllib(url请求处理)
+7，  time(有关时间计算)

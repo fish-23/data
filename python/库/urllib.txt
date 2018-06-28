@@ -1,0 +1,37 @@
+﻿# urllib(url请求)
+# GET请求方法是从服务器上获取数据，可以在url后面加上相应的参数进行请求
+# POST请求是向服务器传送数据，在请求服务器的时候会传输相应的数据
+# urllib 和 urllib2 的区别：
+# urllib既有get请求又有post请求，urllib2 只有post请求
+# urllib2可以接受一个Request类的实例来设置URL请求的headers，urllib仅可以接受URL
+
+# urllib(get请求)
+import urllib
+import urllib.parse
+import urllib.request
+# urlencode方法将字典编码，用于提交数据给url
+data = urllib.parse.urlencode({'spam':1,'eggs':2,'bacon':0})
+print(data)  # 'eggs=2&bacon=0&spam=1'
+url = "http://python.org/query?%s" % data
+# urlopen()方法，对服务器进行请求，服务器接收到请求后会对返回一个相应数据
+result = urllib.request.urlopen(url)
+# urlopen()方法自带的read()方法可以读取响应数据
+x = result.read()
+print(x)
+
+# urllib(post请求)
+data = urllib.parse.urlencode({'spam':1,'eggs':2,'bacon':0})
+url = "http://python.org/query"
+result = urllib.request.urlopen(url,data)
+x = result.read()
+print(x)
+
+
+# urllib2(适用于python2.7)
+import urllib2
+url = "http://111.com/111/222"
+data = {"name":'111',"password":'111'}
+# 通过构建一个request，服务器响应请求得到应答，这样显得逻辑上清晰明确
+req = urllib2.Request(url=url, data=urllib.urlencode(data))
+result = urllib2.urlopen(req).read()
+print(result)

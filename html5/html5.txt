@@ -1,0 +1,165 @@
+﻿#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+
+
+#<!--1.顶层标记 -->
+<html>
+
+#<!--2.显示一行直线 -->
+<hr/>
+
+#<!--3.两p之间为一段内容 -->
+<p> 第一段 山不在高，有仙则名。
+    水不在深，有龙则灵  </p>
+
+#<!--4.br 换行 -->
+<p> 第二段 斯是陋室，惟吾德馨。  <br/>   第三段 苔痕上阶绿，草色入帘青。 </p>
+
+#<!--5.h 设置标题大小 --> 
+<h3> 标题字体大小 </h3>
+
+#<!--6.字体设置 -->
+<b> 粗体 </b> &nbsp;   <i> 斜体 </i> &nbsp;   <del> 这些文字已删除 </del> &nbsp; &nbsp;    
+    <ins> <big> <strong> <em> 字体实验 </ins> </big> </strong> </em>
+
+#<!--7.a 增加文字连接 -->
+<br/> <a href="https://www.baidu.com/" target="1"> 点击进入百度 </a>
+
+#<!--8.普通无边框表格-->
+<h3> 普通无边框表格：</h3>
+   #<!--8.1 table 声明表格-->
+   #<!--8.2 cellspacing 规定两个单元框之间的距离-->
+<table cellspacing="8"> 
+   #<!--8.3 tr 声明表行-->   
+<tr>
+   #<!--8.4 td 声明表单元-->
+   #<!--8.5 表格中表单元是横着排列-->
+ <td>201201 tom </td>  <td>201202 jon </td>   <td>201203 bob</td>
+</tr>
+<tr> 
+ <td>201204 kit</td>  <td>201205 lisa</td>   <td>201206 pik</td>
+</tr>
+</table>
+
+#<!--9.带表头，有边框，有跨列单元-->
+<h3> 带表头，有边框，有跨列单元：</h3>
+   #<!--9.1 border 用于设置 属性边距,整个表最外围的大小 -->
+<table border="1"> 
+<tr>
+   #<!--9.2 th 设置表头-->
+ <th> 表头1 </th>  <th> 表头2 </th>  <th> 表头3 </th>
+</tr>
+<tr>
+ <td>201201 tom</td>  <td>201202 jon</td>   <td>201203 liming</td>
+</tr>
+<tr>
+   #<!--9.3 colspan 跨列单元，一列的内容占几列的大小-->
+   #<!--9.4 rowspan 跨行单元，一行的内容占几行的大小-->
+ <td rowspan="2">201204 kit </td>  <td colspan="2">201205 lisa </td>
+</tr>
+<tr>
+ <td>201206 pik </td>  <td>201207 dor </td>
+</tr>
+</table>
+
+#<!--10.有序和无序列表-->
+   #<!--10.1 无序列表：用<ul>表示列表，用<li>表示表项-->
+   #<!--10.2 有序列表：用<ol>表示列表，用<li>表示表项-->
+   #<!--10.3 列表中表单元是竖着排列-->
+   #<!--10.4 cellspacing 规定两个单元框之间的距离-->
+   #<!--10.5 cellpadding 一个单元框上下边界之间的距离-->
+<table cellpadding="2" cellspacing="2">
+<tr>
+ <td>
+  <ul> <li>python </li>  <li>c++ </li>  <li>java </li>  <li> php</li>
+ </td>
+ <td>
+  <ol> <li>苹果 </li>  <li>香蕉 </li>  <li>葡萄 </li>  <li>西瓜 </li>
+ </td>
+</tr>
+</table>
+
+#<!--11.定义列表-->
+   #<!--11.1 用dl表示列表，用dt表示被定义词，用dd表示定义描述-->
+<dl>
+ <dt>内存 </dt>  <dd>当电脑工作时，电脑会在这里存上存储数据，相当于人的记忆 </dd>
+ <dt>CPU </dt>   <dd>CPU，也称中央处理器，是电脑运算和控制的核心 </dd>
+ <dt>软驱 </dt>   <dd>就是插软盘的玩意，现在一般都用3.5英寸的，古老年代用5.25英寸的，现在我们去买人家都不卖了。  </dd>
+ <dt>光驱 </dt>   <dd>听CD当然少不了这个，有时候你要安装某些软件都是在光盘上的，所以这个用处太大。  </dd>
+</dl>
+
+
+#<!--12.文本输入-->
+   #<!--12.1 单行输入的文本框 <input type="text">  -->
+   #<!--12.2 多行输入的文本框 <textarea>  </textarea> -->
+   #<!--12.3 密码框 <input type="password">  -->
+   #<!--12.4 每个输入框需要设置name选项，用于在表单提交后，服务器识别输入的东西 -->
+   #<!--12.5 colspan 跨列单元，一列的内容占几列的大小-->
+<table>
+<tr>
+ <td> 用户名：</td> 
+ <td> <input type="text" name="name"> </td>
+ <td> 密码：</td>
+ <td> <input type="password" name="pass"> </td>
+</tr>
+<tr>
+ <td colspan = "2">备注： </td>
+</tr>
+<tr>
+   #<!--12.6 rows是行数 cols是列数-->
+ <td colspan = "4"> <textarea name="comment" row="5" cols="60"> </textarea> </td>
+</tr>
+</table>
+
+
+#<!--13.单项选择之单选按钮-->
+   #<!--13.1 单选按钮表示 <input type="radio">  -->
+<table>
+<tr>
+ <td> 性别：</td> 
+   #<!--13.2 checked表示单项选择的默认选项，value作为标记，在服务器上可以检测哪个选项被选中-->
+ <td> 男性<input type="radio" checked="checked" name="sex" value="male">  </td>
+ <td> 女性<input type="radio" name="sex" value="female">  </td>
+</tr>
+
+</table>
+
+
+#<!--14.单项选择之下拉列表-->
+   #<!--14.1 下拉列表用 <select>/<option>表示 -->
+<table>
+<tr>
+ <td>学历: </td>
+</tr>
+<tr>
+ <td colspan="2">
+   #<!--14.2 selected="selected"后的内容为下拉菜单最上面的选项-->
+   #<!--14.3 name选项，用于在表单提交后，服务器识别输入的东西-->
+ <select name="grade">
+ <option value="middle"> 高中以下 </option>
+ <option value="high">专科 </option>
+ <option value="bachlor" selected="selected">本科</option>
+ <option value="master">研究生以上</option>
+ </select>
+ </td>
+</tr>
+</table>
+
+#<!--15.多项选择-->
+   <!--15.1 多项选择用 <input type="chechbox">表示 -->
+<table>
+<tr>
+ <td rowspan="3">个人喜好: </td>
+</tr>
+<tr>
+ <td> 苹果：<input type="checkbox" name="apple"> </td>
+ <td> 香蕉：<input type="checkbox" name="banana"> </td>
+ <td> 西瓜：<input type="checkbox" name="watermelon"> </td>
+</tr>
+<tr>
+ <td> 冬瓜：<input type="checkbox" name="Wax gourd"> </td>
+ <td> 南瓜：<input type="checkbox" name="pumpkin"> </td>
+ <td> 黄瓜：<input type="checkbox" name="cucumber"> </td>
+</tr>
+</table>
