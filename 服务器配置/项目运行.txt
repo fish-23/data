@@ -20,6 +20,8 @@ curl http://127.0.0.1:10082/   # 你好，世界
 
 
 
+
+
 二，nginx反向代理
 
 1，python代码
@@ -119,7 +121,9 @@ server {
    
 
 
-三，nginx反向代理 uwsgi
+
+
+三，nginx反向代理 uwsgi 
 
 1，python代码
 
@@ -167,6 +171,8 @@ server {
 
 
 3，编辑uwsgi配置文件
+# uWSGI是一个Web应用服务器，它具有应用服务器，代理，进程管理及应用监控等功能
+# 它支持WSGI协议，同时它也支持自有的uWSGI协议，性能好，内存占用率低
 # uwsgi有多种形式的配置文件，一般常用的是.ini文件
 # uwsgi --help 关于配置不懂的，可以自己查询
 # vim /etc/uwsgi/apps-available/bottle.ini
@@ -191,10 +197,10 @@ gid = root
 ln -s /etc/uwsgi/apps-available/bottle.ini /etc/uwsgi/apps-enabled/bottle.ini
 
 5，启动nginx：nginx  -c /etc/nginx/nginx.conf
-     启动uwsgi：service uwsgi restart
-     运行python: python /home/todo.py
-     此时显示 Listening on http://127.0.0.1:8080/    浏览器显示502错误
-
-     修改python代码，将地址和端口号加上，运行结果 Listening on http://127.0.0.1:10081/
-     浏览器访问http://114.67.224.92:10080/  显示502错误 python 报错 code 400, message Bad request syntax
-     修改nginx和uwsgi配置，将端口改成8080，结果显示502错误 python 报错 code 400, message Bad request syntax
+   重启uwsgi：service uwsgi restart
+   浏览器显示502错误
+   lsof -i:10080 (被nginx监听)   lsof -i:10081(没用监听的程序)
+   查看nginx日志文件：tail -f /var/log/nginx/error.log
+   报错：(111: Connection refused) while connecting to upstream  upstream: "uwsgi://127.0.0.1:10081"(没有连接上uwsgi)
+   启动uwsgi：uwsgi --ini /etc/uwsgi/apps-available/bottle.ini
+   访问浏览器，成功显示  '你好，世界'
