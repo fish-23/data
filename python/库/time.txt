@@ -95,3 +95,14 @@ time_temp = '19970331'
 dt = datetime.date(int(time_temp[0:4]), int(time_temp[4:6]), int(time_temp[6:8]))
 print('1个月前的今天是',months(dt,-1))
 print('6个月前的今天是',months(dt,-6))
+
+
+# 计算两个时间类型的时间差值
+x1 = '2018-07-12 00:32:00'
+x1 = datetime.datetime.strptime(x1,"%Y-%m-%d %H:%M:%S")
+x2 = datetime.datetime.now()
+print(x2) # 2018-07-12 00:32:31.459054
+x3 = (x2 - x1).total_seconds()
+print(x3) # 31.459054
+x3 = int(x3)
+print(x3) # 31
