@@ -3,6 +3,9 @@
 
 import time,datetime,calendar
 
+# 让程序休眠10秒
+x = time.sleep(10)
+
 # 获取当前时间（结构时间类型）
 x = time.localtime()
 print(x,type(x))
@@ -32,6 +35,8 @@ dt = x.timestamp()
 print(dt,type(dt))  # 1526892340.875899 <class 'float'>
 
 
+# 获取当前时间(时间戳)
+x = int(time.time())
 # 将时间戳转化成当前时间（字符串类型）
 dt = 1516291200
 x = time.localtime(dt)
