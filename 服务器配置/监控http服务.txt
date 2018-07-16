@@ -63,3 +63,39 @@ def start():
             
 if __name__ == '__main__':
     start()
+
+# 程序在运行的过程中，函数运行时，系统会自动分配内存，当函数返回时，内存释放
+# 在使用递归时，每多一层函数，就会耗费一点内存，如果运用递归死循环，会导致内存用完，程序退出
+# 实际执行时，递归调用1000次会出错。这就是上面程序运行时总自动退出
+
+#改代码，用while True实现死循环执行程序
+
+def monitor(x,time_send):
+    ret = url()
+    if int(ret) == 2:
+        if x == 0:
+            time_now = int(time.time())
+            time_judge = time_send + 60
+            if time_judge > time_now:  
+                return('%s,%s'%(x,time_send))
+            else:
+                send_sms()
+                time_send = int(time.time())
+                x = 1
+                time.sleep(1)
+                return('%s,%s'%(x,time_send))
+        else:
+            time.sleep(1)
+            return('%s,%s'%(x,time_send))
+    else:
+        x = 0
+        time.sleep(1)
+        return('%s,%s'%(x,time_send))
+        
+def start():
+    x = 0
+    time_send = 0
+    while True:
+        ret = monitor(x,time_send)
+        x = int(ret.split(',')[0])
+        time_send = int(ret.split(',')[1])
