@@ -1,0 +1,26 @@
+一 ，python 版本管理工具
+
+1，（1）virtualenv用来为一个应用创建一套“隔离”的Python运行环境，用于管理不同版本之间的代码
+
+2，（1）安装virtualenv： pip3 install virtualenv
+   （2）规定环境：virtualenv -p python2.7 --no-site-packages admin
+                 virtualenv -p python3.6 --no-site-packages store
+                 备注： -p python2.7   -p 表示 python 版本
+                        --no-site-packages 意思是不使用系统的任何包，如果使用，自己安装
+                        admin 表示 在这个文件夹下用的是python2.7，如果文件夹不存在会自动创建
+   （3）用 virtualenv这个命令规定了admin文件夹的运行环境之后，不能在这个文件夹里面再规定别的环境
+   （4）激活环境：source bin/activate （需要在目录里面激活，cd admin 后操作）
+         只有在激活的状态下输入 python 才会显示目录规定的环境，不激活的话就是系统自带的环境
+   （5）安装pw：pip install peewee==2.5   == 和后面的数字表示指定版本号
+   （6）取消环境：pyenv deactivate
+   （7）安装好环境之后会出现三个文件夹（lib  include  bin ）和一个 文件（pip-selfcheck.json）
+     
+3，（1）使用 uwsgi 运行代码前，先进入目录, 再source bin/activate 激活环境，然后运行 uwsgi
+   （2）运行完之后，运行 pyenv deactivate恢复，不会影响其他的程序。
+   （3）每个项目都写 requirements.txt ，列出需要的版本。
+   （4）建立好 python 环境之后，只要用  pip 安装这些需要的版本就可以。
+        pip install -r requirements.txt
+
+4，（1）和 git 的关系
+        virtualenv 是针对 python 和 库版本的，所以在高层
+        git 是针对项目的，所以在里面

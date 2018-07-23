@@ -44,7 +44,9 @@
             将py文件的运行的所有结果记录在1.txt中，将最新一条结果记录在2.txt中，后台运行，其中的1表示标准输出，2表示标准错误
   （11）< 重定向输出（会读取后面的文件）
         eg：cat > 1.txt > 2.txt 
-  （12）./  当前目录   ../  上级目录
+  （12） && 与
+             make && make install     执行make如果没有发生错误就执行make install
+  （13）./  当前目录   ../  上级目录
 
 
 4，基础操作
@@ -138,6 +140,15 @@
             diff -ruN 1.py 2.py > pat.patch  生成补丁文件pat.patch
   （21）patch 打补丁  -p(设置欲剥离几层路径名称)  路径是从补丁文件所在文件夹开始计算 p1是去掉一层目录  p0为去掉目录前的/
         eg：patch -p0 1.py pat.patch   给文件1.py打补丁
+  （22）wget  下载文件  -O(指定路径并重命名文件)  -o(将下载信息保存到文件里面)  -b(后台下载)
+        eg：wget http://www.baidu.com  下载百度首页的html文件，并保存到当前文件夹下
+        eg：wget -O /home/baidu.html  http://www.baidu.com  下载百度首页的html文件，并将内容保存到/home路径下的baidu.html文件里面
+        eg：wget -b http://www.baidu.com  后台下载百度首页的html文件
+        eg：wget -o baidu.txt http://www.baidu.com  下载百度首页的html文件，吧并将下载信息保存到baidu.txt里面
+  （23）configure  用于配置安装源代码库和软件    --prefix = 指定配置路径
+         ./configure --prefix=/usr/local/python3   将当前文件夹下的源代码配置到/usr/local/python3
+  （24）make 编译     make install 安装
+         make && make install     执行make如果没有发生错误就执行make install
 
 
 5，磁盘管理
