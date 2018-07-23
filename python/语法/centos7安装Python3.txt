@@ -1,0 +1,22 @@
+1，安装依赖包
+   yum -y groupinstall "Development tools"
+   yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel
+
+2，下载需要的python版本(根据需求下载,下面仅供参考)
+   wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz
+
+3，安装
+   mkdir /usr/local/python3 (创建安装目录)
+   tar -xvJf  Python-3.6.2.tar.xz (解压安装包)
+   cd Python-3.6.2 (进入python目录)
+   ./configure --prefix=/usr/local/python3 (配置安装目录)
+   make && make install (编译安装)
+
+4，创建软链接
+   ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+   ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+
+5，参考文件
+https://www.cnblogs.com/FZfangzheng/p/7588944.html
+https://www.cnblogs.com/zhangbo127/p/4556008.html
+https://blog.csdn.net/tq384998430/article/details/71480118
