@@ -1,0 +1,157 @@
+﻿1，安装：pip install sqlalchemy
+
+
+2，初始化DBSession
+     # 导入:
+     from sqlalchemy import *
+     from sqlalchemy.orm import *
+     from sqlalchemy.ext.declarative import*
+     # 创建对象的基类:
+     Base = declarative_base()
+     # 初始化数据库连接:
+     # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
+     engine = create_engine('mysql+mysqlconnector://root:password@localhost:3306/test', encoding="utf-8")
+     # 创建DBSession类型:
+     DBSession = sessionmaker(bind=engine)
+
+
+3，创建表
+    # 定义User对象:
+    class User(Base):
+          # 表的名字:
+          __tablename__ = 'user'
+          # 表的结构:
+         id = Column(Integer, primary_key=True, autoincrement=True)
+         name = Column(String(20))
+         phone = Column(String(20))
+         books = relationship('Book', backref = 'user')
+         # res = session.query(User).all() 返回的结果为查询的对象
+         # 加上下面的方法，查询后返回的结果为数据
+         def __repr__(self):
+              output = "(%s,%s,%s)" %(self.nid,self.name,self.role)
+              return output
+
+    # 定义Book对象:
+    class Book(Base):
+         __tablename__ = 'book'
+         id = Column(Integer, primary_key=True, autoincrement=True)
+         name = Column(String(20))
+         user_id = Column(String(20), ForeignKey('user.id')) 
+   
+    Base.metadata.create_all(engine)  #创建表
+  # Base.metadata.drop_all(engine)   #删除表
+
+
+4，表关系
+   （1） 一对多
+          # 一个parent对多个child，一对多关系添加一个外键到child表，用于保存对应parent.id的值，引用parent。
+          # relationship()在parent中指定，引用/保存 一批 child 表中关联的条目
+          # children = relationship("Child")  建立单向关系，parent表可以访问child表里的数据，child表不能
+          # children = relationship("Child", backref="parent") 建立双向关系，可以相互访问。
+          # 表child获得一个parent属性, 值为对应的parent表中的条目
+          class Parent(Base):
+               __tablename__ = 'parent'
+               id = Column(Integer, primary_key=True)
+               children = relationship("Child", backref="parent")
+
+          class Child(Base):
+                __tablename__ = 'child'
+                id = Column(Integer, primary_key=True)
+                parent_id = Column(Integer, ForeignKey('parent.id'))
+
+   （2） 多对一
+          # 在多对一关系中，relationship放在了从表中
+         class Parent(Base):
+              __tablename__ = 'parent'
+              id = Column(Integer, primary_key=True)
+             child_id = Column(Integer, ForeignKey('child.id'))
+             child = relationship("Child")
+ 
+         class Child(Base):
+              __tablename__ = 'child'
+              id = Column(Integer, primary_key=True)
+   （3） 一对一
+        # 一对一关系就是对一对多关系加个限定uselist=False
+        class Parent(Base):
+             __tablename__ = 'parent'
+            id = Column(Integer, primary_key=True)
+            child = relationship("Child", uselist=False, backref="parent")
+
+       class Child(Base):
+            __tablename__ = 'child'
+            id = Column(Integer, primary_key=True)
+            parent_id = Column(Integer, ForeignKey('parent.id'))
+
+   （4） 多对多
+       # 多对多关系需要在两个类之间增加一个关系表
+       # 关系表通过relationship()的secondary参数标识
+       # 需要在relationship中加上secondary=association_table
+       association_table = Table('association', Base.metadata,
+           Column('left_id', Integer, ForeignKey('left.id')),
+           Column('right_id', Integer, ForeignKey('right.id'))
+           )
+
+       class Parent(Base):
+            __tablename__ = 'left'
+            id = Column(Integer, primary_key=True)
+            children = relationship("Child", secondary=association_table)
+
+      class Child(Base):
+           __tablename__ = 'right'
+           id = Column(Integer, primary_key=True)
+
+
+5，数据类型
+     name =  Column(Integer)         # int类型
+     name =  Column(SmallInteger)  # 短整型
+     name =  Column(Float)            # float类型
+     name =  Column(DECIMAL(4,2))    # 定点类型
+     name =  Column(String(20))      # varchar类型
+     name =  Column(Text)             # text类型
+     name =  Column(LONGTEXT)   # longtext类型
+     name =  Column(Boolean)       # 布尔类型
+     name =  Column(DateTime)     # datetime类型
+     name =  Column(Date)           # date类型
+     name =  Column(Time)           # time类型
+     name =  Column(Integer, default=1)                     # 创建字段的时候如果没有赋值默认成1 而不是null
+     name =  Column(Integer, nullable=True)               # 这个字段可以不存储数据
+     name =  Column(Integer, unique=True)                 # 该列不允许相同值
+     name =  Column(Integer, primary_key=True)         # 为该列表的主键
+     name =  Column(Integer, index=True)                   # 为该列创建索引，查询效率会更高
+     name =  Column(Integer, autoincrement=True)     # 该字段自增长          
+
+
+5，增删改查
+   （1）增
+          session = DBSession()
+          new_user = Users(name="tom", phone ='183')
+          session.add(new_user )
+          session.commit()
+          session.close()
+
+          session = DBSession()
+          session.add_all([
+          Users(name="tom1", phone ='183'),
+          Users(name="tom2", phone ='183'),
+           ])
+          session.commit()
+          session.close()
+   （2）删
+          session = DBSession()
+          session.query(Users).filter(Users.id = 2).delete()
+          session.commit()          
+          session.close()
+   （3）改
+          session = DBSession()
+          session.query(Users).filter(Users.id = 2).update({"name" : "099"})
+
+session.query(Users).filter(Users.id > 2).update({Users.name: Users.name + "099"}, synchronize_session=False)
+session.query(Users).filter(Users.id > 2).update({"num": Users.num + 1}, synchronize_session="evaluate")
+session.commit()
+
+10，参考文档
+https://www.cnblogs.com/pycode/p/mysql-orm.html
+http://www.cnblogs.com/chen0427/p/8627587.html
+http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html
+https://www.cnblogs.com/sysnap/p/6484226.html?utm_source=itdadao&utm_medium=referral
+https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014320114981139589ac5f02944601ae22834e9c521415000
