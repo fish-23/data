@@ -1,6 +1,5 @@
 ﻿1，安装：pip install sqlalchemy
 
-
 2，初始化DBSession
      # 导入:
      from sqlalchemy import *
@@ -39,7 +38,7 @@
          user_id = Column(String(20), ForeignKey('user.id')) 
    
     Base.metadata.create_all(engine)  #创建表
-  # Base.metadata.drop_all(engine)   #删除表
+ # Base.metadata.drop_all(engine)   #删除表
 
 
 4，表关系
@@ -122,36 +121,91 @@
 
 
 5，增删改查
+     #   在增删改查之前，需要加上下面一句，进行连接
+     #   session = DBSession()
+     #   操作完成时，用以下命令提交事务，关闭连接
+     #   session.commit()
+     #   session.close()
    （1）增
-          session = DBSession()
+          # 增加一条(方法一)
           new_user = Users(name="tom", phone ='183')
           session.add(new_user )
-          session.commit()
-          session.close()
-
-          session = DBSession()
+          # 增加一条(方法二)       
+          user = User()
+          user.name = "tom"
+          user.phone = "183"
+          session.add(user)
+          # 增加多条
           session.add_all([
           Users(name="tom1", phone ='183'),
           Users(name="tom2", phone ='183'),
            ])
-          session.commit()
-          session.close()
    （2）删
-          session = DBSession()
-          session.query(Users).filter(Users.id = 2).delete()
-          session.commit()          
-          session.close()
+          user = session.query(Users).filter(Users.id = 2)
+          user.delete()
    （3）改
-          session = DBSession()
+          方法一
           session.query(Users).filter(Users.id = 2).update({"name" : "099"})
-
-session.query(Users).filter(Users.id > 2).update({Users.name: Users.name + "099"}, synchronize_session=False)
-session.query(Users).filter(Users.id > 2).update({"num": Users.num + 1}, synchronize_session="evaluate")
-session.commit()
-
-10，参考文档
-https://www.cnblogs.com/pycode/p/mysql-orm.html
-http://www.cnblogs.com/chen0427/p/8627587.html
-http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html
-https://www.cnblogs.com/sysnap/p/6484226.html?utm_source=itdadao&utm_medium=referral
-https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014320114981139589ac5f02944601ae22834e9c521415000
+          方法二
+          user = session.query(User).filter_by(Users.id = 2).first()
+          user.phone  = '181'
+           
+   （4）查
+          (1) 查询所有数据
+             ret = session.query(User).all()
+          (2) 查询，返回最多一条数据,数据为空不报错
+             ret = session.query(User).first()
+          (3) 查询一个结果，如果大于一个结果会报错,，没有数据为None
+             ret = session.query(User).one()
+          (4) 对查询的数据进行排序，并取出其中的第二和第三条数据
+             ret = session.query(User).order_by(User.id)[1:3]
+          (5) filter_by和filter对数据进行筛选，后者更灵活,可以在后者的参数中使用python的运算符
+              ret = session.query(User.name).filter(User.id == 1)
+          (6) 可以多次筛选,串接的filter之间是与的关系,也可以合并(and)
+              ret = session.query(User.name).filter(User.id == 1).filter(User.name == 'tom')
+              ret = session.query(User.name).filter(User.id == 1, User.name == 'tom')
+          (7) 或查询(or)，匹配查询(match)
+              ret = session.query(User.name).filter(or_(User.name == 'ed', User.name == 'wendy'))
+              ret = session.query(User.name).filter(User.name.match('wendy'))
+          (8) 模糊查询(like)
+              ret = session.query(User.id).filter(User.name.like('%to%'))
+          (9) in(可以使列表，也可以是查询结果)
+              ret = session.query(User.id).filter(User.name.in_(['ed', 'wendy', 'jack']))
+              ret = session.query(User.id).filter(User.name.in_( session.query(User.name).filter(User.name.like('%ed%'))
+              # 加上~为not in
+              ret = session.query(User.id).filter(~User.name.in_(['ed', 'wendy', 'jack']))
+          (10) text() 可以使用sql语句，params() 传递参数
+               ret = session.query(User).filter(text("id=:ids and name=:names")).params(ids=1, name='tom').one()
+          (11) count() 用于计数，func.count() 更精确的统计
+               ret = session.query(func.count(), User.name).count()    
+               ret = session.query(func.count(User.name), User.name)
+          (12) 主从表之间的查询
+              # 下面语句查询出user表的信息
+              ret = session.query(User).filter_by(name='jack').one()
+              # 查询book表对应的信息
+              bookret = ret.book
+          (13) 多表查询
+              # 有一个外键的两表查询
+              ret = session.query(User).join(Address).filter(Address.email_address=='jack@google.com').all()
+              ret = session.query(User, Address).filter(User.id==Address.user_id).filter(Address.email_address=='jack@google.com').all()
+              # 没有外键或者有多个外键的查询
+              ret = session.query(User).join(Address, User.id==Address.user_id).all()
+              ret = session.query(User) .join(Address, User.addresses).all()
+              # 外连接
+              ret = session.query(User).outerjoin(User.addresses).all()
+          (14) 别名(aliased)
+               # 在查询时，当一个表被用到两次时，需要用别名来区分
+               adalias1 = aliased(Address)
+               adalias2 = aliased(Address)
+               ret = session.query(User.name, adalias1.email_address, adalias2.email_address).\
+                        join(adalias1, User.addresses).join(adalias2, User.addresses).\
+                        filter(adalias1.email_address=='jack@google.com').filter(adalias2.email_address=='j25@yahoo.com')
+                                   
+6，参考文档
+     https://www.cnblogs.com/pycode/p/mysql-orm.html
+     http://www.cnblogs.com/chen0427/p/8627587.html
+     https://www.jianshu.com/p/8d085e2f2657
+     https://www.jianshu.com/p/9771b0a3e589
+     http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html
+     https://www.cnblogs.com/sysnap/p/6484226.html?utm_source=itdadao&utm_medium=referral
+     https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014320114981139589ac5f02944601ae22834e9c521415000
