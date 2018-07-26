@@ -1,0 +1,164 @@
+﻿1，概念
+  （1） 异步IO：发起一个IO操作，却不用等它结束，你可以继续做其他事情，当它结束时，你会得到通知
+  （2） coroutine(协程)：它的调用不会立即执行函数，而是会返回一个协程对象。协程对象需要注册到事件循环，由事件循环调用
+  （3） EventLoop(事件循环)：程序开启一个无限循环，把一些函数注册到事件循环上，当满足事件发生的时候，调用相应的协程函数
+  （4） task(任务)：任务是对协程进一步封装，其中包含了任务的各种状态
+  （5） future：代表将来执行或没有执行的任务的结果，task是future的子类，这两个很类似
+  （6） 阻塞调用：调用结果返回之前，当前线程会被挂起。函数只有在得到结果之后才会返回。
+  （7） 线程被挂起：线程进入非可执行状态，在这个状态下，CPU不会给线程分配时间片，即线程暂停运行
+  （8） 非阻塞调用：不会挂起，直接执行接下去的程序，返回结果后再回来处理返回值
+
+
+2，定义协程：
+   # hello就是定义的一个协程 @asyncio.coroutine 和 async 用来定义协程函数
+   # yield from 和 await  表示产生中断
+   # asyncio.sleep(10) 为另一个协程，这个协程执行完毕后，hello协程会继续执行
+   # print(asyncio.iscoroutinefunction(hello))  用来验证协程函数，是会返回True
+  （1）@asyncio.coroutine
+       def hello():
+           print("Hello world!")
+           r = yield from asyncio.sleep(10)
+           print("Hello again!")
+  （2）async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+
+         
+3，运行协程：
+  （1）调用协程函数，协程并不会开始运行，会发出一条警告
+  （2）可以在Eventloop中运行，或者在另一个已经运行的协程中用 `await` 等待它，或者通过 `ensure_future` 函数计划它的执行
+  （3）运行一个协程
+       # 获取EventLoop:
+       # event负责I/O时间通知
+       # loop负责循环处理I/O通知并在就绪时调用回调
+       loop = asyncio.get_event_loop()
+       # 执行coroutine
+       # run_until_complete 是一个阻塞调用，直到协程运行结束，它才返回
+       # run_until_complete 的参数是一个future对象,我们传给它的是一个协程对象
+       # 在它的内部，通过 ensure_future 函数把协程对象包装成了future对象
+       # 所以执行协程，可以这样写 loop.run_until_complete(asyncio.ensure_future(hello()))
+       loop.run_until_complete(hello())       
+       # 示例
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+       loop = asyncio.get_event_loop()
+       loop.run_until_complete(hello())
+       loop.close       
+       
+  （4）运行多个协程(方法一)
+       # run_until_complete()方法只能运行一个协程，可以加上asyncio.gather()来运行多个协程
+       # asyncio.gather()会对协程进行聚合
+       # 示例
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+       loop = asyncio.get_event_loop()
+       gathers = asyncio.gather(hello(),hello(),hello())
+       loop.run_until_complete(gathers)
+       loop.close
+
+       # 用 run_until_complete()调用协程，在调用完成之后，会自动返回
+       # 用 run_forever()调用协程，调用结束后，程序不会退出，会一直执行下去
+       # 示例
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+       loop = asyncio.get_event_loop()
+       gathers = asyncio.gather(hello(),hello())
+       asyncio.ensure_future(gathers)
+       loop.run_forever()
+       loop.close
+
+       # 只有执行了stop()函数，程序才会停止
+       # 如果把loop.stop()加在loop.run_forever()后面，程序不会停止，因为run_forever()不返回，stop()永远也不会被调用
+       # 如果把loop.stop()协程里面，这样当协程运行完之后，就会停止，可是运行不了多个协程，因为第一个协程就会让程序停止
+       # 要解决这个问题，可以用 gather 把多个协程合并成一个 future，并添加回调，然后在回调里再去停止 loop。
+       # 示例
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+       def done_callback(futu):
+           print('Done')
+           loop.stop()
+       loop = asyncio.get_event_loop()
+       gathers = asyncio.gather(hello(),hello())       
+       futu = asyncio.ensure_future(gathers)
+       futu.add_done_callback(done_callback)
+       loop.run_forever()
+       loop.close
+  
+  （5）运行多个协程(方法二)
+       # asyncio.gather() 和 asyncio.wait() 功能相似
+       # 测试证明，asyncio.wait() tasks里面的对象是从后向前执行的
+       # 测试证明，asyncio.gather tasks里面的对象先执行第一个，然后从后向前执行
+       # loop.run_until_complete(asyncio.wait(tasks))
+       # loop.run_until_complete(asyncio.gather(*tasks))
+       loop = asyncio.get_event_loop()
+       tasks = [print_sum(1,2),print_sum(3,4),print_sum(5,6)]
+       loop.run_until_complete(asyncio.wait(tasks))
+       loop.close()       
+       # 示例
+       async def compute(x, y):
+           print("Compute %s + %s ..." % (x, y))
+           await asyncio.sleep(10.0)
+           return x + y
+       async def print_sum(x, y):
+           result = await compute(x, y)
+           print("%s + %s = %s" % (x, y, result))
+       loop = asyncio.get_event_loop()
+       tasks = [print_sum(1,2),print_sum(3,4),print_sum(5,6)]
+       loop.run_until_complete(asyncio.wait(tasks))
+       loop.close()
+  
+  （6）result 接收协程返回数据       
+       # 协程返回数据用result方法接收
+       # 如果只有一个协程，run_until_complete()返回也是协程的返回
+       # 如果协程没有返回result 和 run_until_complete() 返回为None
+       # 如果两个协程返回，result 和 run_until_complete() 返回是 两个协程返回数据组成的列表
+       # 示例
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+           return('end')
+       loop = asyncio.get_event_loop()
+       futu = asyncio.ensure_future(hello())
+       ret = loop.run_until_complete(futu)
+       print('return is', futu.result())   # return is end
+       print('ret is', ret )    # ret is end
+       loop.close
+
+       
+4，添加回调：
+  （1）添加回调函数后，当一个协程执行完成，会得到通知
+       # hello为协程，done_callback为回调函数
+       async def hello():
+           print("Hello world!")
+           r = await asyncio.sleep(1)
+           print("Hello again!")
+       # 回调函数必须有个future对象传入参数，否则会报错。 这与add_done_callback函数有关
+       # 如果回调函数有参数，必须放到future对象前面
+       def done_callback(futu):
+           print('Done')
+       # 将协程对象包装成了future对象
+       loop = asyncio.get_event_loop()
+       futu = asyncio.ensure_future(hello())
+       # 给future对象添加一个回调函数done_callback
+       # 如果这个Future对象已经done，则直接执行回调函数，否则将回调函数加入到Future类的一个成员列表中保存。
+       futu.add_done_callback(done_callback)
+       loop.run_until_complete(futu)
+       loop.close()
+
+
+5，参考文件
+   https://www.cnblogs.com/rockwall/p/5750900.html
+   https://docs.python.org/3/library/asyncio.html
+   https://segmentfault.com/a/1190000008814676
+   http://python.jobbole.com/87310/
+   https://www.cnblogs.com/zhaof/p/8490045.html
