@@ -1,0 +1,99 @@
+﻿1，基本使用
+（1）logging中可以选择很多消息级别，如debug、info、warning、error以及critical
+     (1) debug：调试过程中使用DEBUG等级，如算法中每个循环的中间状态
+     (2) info：处理请求或者状态变化等日常事务
+     (3) warning：发生很重要的事件，但是并不是错误时，如用户登录密码错误
+     (4) error：发生错误时，如IO操作失败或者连接问题
+     (5) critical：特别糟糕的事情，如内存耗尽、磁盘空间为空，一般很少使用
+（2）通过赋予不同的级别，开发者就可以只输出错误信息到特定的记录文件，或者在调试时只记录调试信息
+（3）logging.basicConfig函数各参数：
+    (1) filename：指定日志文件名
+    (2) filemode：和file函数意义相同，指定日志文件的打开模式，'w'或者'a'
+    (3) datefmt：指定时间格式，同time.strftime()
+    (4) level：设置日志级别，默认为logging.WARNNING
+    (5) stream：指定将日志的输出流，可以指定输出到sys.stderr，sys.stdout或者文件，默认输出到sys.stderr，当stream和filename同时指定时，stream被忽略
+    (6) format：指定输出的格式和内容
+       (1) %(levelno)s：打印日志级别的数值
+       (2) %(levelname)s：打印日志级别的名称
+       (3) %(pathname)s：打印当前执行程序的路径，其实就是sys.argv[0]
+       (4) %(filename)s：打印当前执行程序名
+       (5) %(funcName)s：打印日志的当前函数
+       (6) %(lineno)d：打印日志的当前行号
+       (7) %(asctime)s：打印日志的时间
+       (8) %(thread)d：打印线程ID
+       (9) %(threadName)s：打印线程名称
+       (10) %(process)d：打印进程ID
+       (11) %(message)s：打印日志信息
+（4）示例
+    # 配置
+    import logging
+    logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+    # 运行
+    log.info("Start print log")
+    log.debug("Do something")
+    log.warning("Something maybe fail.")
+    log.info("Finish")
+
+
+
+2，将日志写入到文件
+（1）将日志写入文件并显示到屏幕
+     import logging
+     # 获取日志
+     log = logging.getLogger(__name__)
+     # 设置日志级别
+     log.setLevel(level = logging.INFO)
+
+     # 设置日志输出文件
+     # 将日志输出到文件
+     handler = logging.FileHandler("log.txt")
+     # 设置日志文件级别
+     handler.setLevel(logging.INFO)
+     # 指定输出的格式和内容
+     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+     # 添加设置
+     handler.setFormatter(formatter)
+    
+     # 设置日志输出到屏幕
+     console = logging.StreamHandler()
+     console.setLevel(logging.INFO)
+
+     # 添加
+     log.addHandler(handler)
+     log.addHandler(console)
+
+     # 运行
+     log.info("Start print log")
+     log.debug("Do something")
+     log.warning("Something maybe fail.")
+     log.info("Finish")
+
+（2）日志回滚
+     import logging
+     from logging.handlers import RotatingFileHandler
+     # 获取日志
+     log = logging.getLogger(__name__)
+     log.setLevel(level = logging.INFO)
+
+     # RotatingFileHandler 用于日志回滚
+     #定义一个RotatingFileHandler，最多备份3个日志文件，每个日志文件最大1K
+     rHandler = RotatingFileHandler("log.txt",maxBytes = 1*1024,backupCount = 3)
+     # 设置日志文件级别
+     rHandler.setLevel(logging.INFO)
+     # 指定输出的格式和内容
+     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+     # 添加设置
+     rHandler.setFormatter(formatter)
+
+     console = logging.StreamHandler()
+     console.setLevel(logging.INFO)
+     console.setFormatter(formatter)
+
+     log.addHandler(rHandler)
+     log.addHandler(console)
+
+     log.info("Start print log")
+     log.debug("Do something")
+     log.warning("Something maybe fail.")
+     log.info("Finish")
