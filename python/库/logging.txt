@@ -28,6 +28,7 @@
     # 配置
     import logging
     logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # 在 python 中，变量 __name__ 的名称就是当前模块的名称，就代表logging.py
     logger = logging.getLogger(__name__)
     # 运行
     log.info("Start print log")
@@ -45,8 +46,8 @@
      # 设置日志级别
      log.setLevel(level = logging.INFO)
 
-     # 设置日志输出文件
      # 将日志输出到文件
+     # Handler对象负责分配合适的log信息到handler指定的目的地
      handler = logging.FileHandler("log.txt")
      # 设置日志文件级别
      handler.setLevel(logging.INFO)
@@ -59,7 +60,7 @@
      console = logging.StreamHandler()
      console.setLevel(logging.INFO)
 
-     # 添加
+     # Logger对象可以用addHandler()方法添加零个或多个handler对象到它自身
      log.addHandler(handler)
      log.addHandler(console)
 
@@ -69,31 +70,75 @@
      log.warning("Something maybe fail.")
      log.info("Finish")
 
-（2）日志回滚
-     import logging
-     from logging.handlers import RotatingFileHandler
-     # 获取日志
-     log = logging.getLogger(__name__)
-     log.setLevel(level = logging.INFO)
+（2）日志回滚(切割)
+    (1) 方法一：按文件大小分割
+        # 定义一个RotatingFileHandler，最多备份3个日志文件，每个日志文件最大1K
+        # 三个选项，第一个(路径)，第二个(文件达到多大进行分割) 第三个(最多存储几个文件)
+        rHandler = logging.handlers.RotatingFileHandler("log.txt",maxBytes = 1*1024,backupCount = 3)
 
-     # RotatingFileHandler 用于日志回滚
-     #定义一个RotatingFileHandler，最多备份3个日志文件，每个日志文件最大1K
-     rHandler = RotatingFileHandler("log.txt",maxBytes = 1*1024,backupCount = 3)
-     # 设置日志文件级别
-     rHandler.setLevel(logging.INFO)
-     # 指定输出的格式和内容
-     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-     # 添加设置
-     rHandler.setFormatter(formatter)
+        方法二：按时间分割
+        # 定义一个TimedRotatingFileHandler，按照小时进行分割，每5个小时分割一次，最多保存40个文件
+        # 四个选项，第一个选项(路径)，第二个选项(按什么规则分割)，第三个选项(分割的限定)，第四个选项(最多存储几个文件)
+        # when参数：S(秒)，M(分钟)，H(小时)，D(天)，S(秒)，midnigh-roll over at midnight(每天半夜对日志进行分割)
+        #           W{0-6}-roll over on a certain day;0-Monday(每周周一对日志进行分割)
+        rHandler = logging.handlers.TimedRotatingFileHandler(LOG_FILE,when='h',interval=5,backupCount=40)
+        
+    (2) 例子
+        import logging
+        from logging.handlers import RotatingFileHandler
+        # 获取日志
+        log = logging.getLogger(__name__)
+        log.setLevel(level = logging.INFO)
 
-     console = logging.StreamHandler()
-     console.setLevel(logging.INFO)
-     console.setFormatter(formatter)
+        # RotatingFileHandler 用于日志回滚
+        #定义一个RotatingFileHandler，最多备份3个日志文件，每个日志文件最大1K
+        rHandler = RotatingFileHandler("log.txt",maxBytes = 1*1024,backupCount = 3)
+        # 设置日志文件级别
+        rHandler.setLevel(logging.INFO)
+        # 指定输出的格式和内容
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # 添加设置
+        rHandler.setFormatter(formatter)
 
-     log.addHandler(rHandler)
-     log.addHandler(console)
+        console = logging.StreamHandler()
+        console.setLevel(logging.INFO)
+        console.setFormatter(formatter)
 
-     log.info("Start print log")
-     log.debug("Do something")
-     log.warning("Something maybe fail.")
-     log.info("Finish")
+        log.addHandler(rHandler)
+        log.addHandler(console)
+
+        log.info("Start print log")
+        log.error("1111111")
+        log.warning("Something maybe fail.")
+        log.info("Finish")
+     
+3，日志增加异常
+   log.error(traceback.format_exc())
+   log.error("product_info:%s"%traceback.format_exc())
+   logger.error('Failed to open file', exc_info=True)
+   调用 logger.exception(msg, _args)，它等价于 logger.error(msg, exc_info=True, _args)
+
+4，配置
+   #!/usr/local/python3
+   # -*- coding: UTF-8 -*-
+
+   import logging,os
+
+   LOGDIR = '/var/log/store'
+   LOGINFO = os.path.join(LOGDIR, 'info.log')
+   LOGFMT = '%(asctime)s - [%(levelname)s] - %(levelno)s - %(process)d - %(message)s'
+
+
+   log = logging.getLogger(__name__)
+   log.setLevel(level = logging.INFO)
+
+   handler =  RotatingFileHandler(LOGINFO,maxBytes = 10240*1024,backupCount = 5)
+   handler.setLevel(logging.INFO)
+   formatter = logging.Formatter(LOGFMT)
+   handler.setFormatter(formatter)
+    
+   console = logging.StreamHandler()
+   console.setLevel(logging.INFO)
+
+   log.addHandler(handler)
+   log.addHandler(console)
