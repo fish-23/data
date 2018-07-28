@@ -5,3 +5,5 @@
 5,   itertools(操作迭代对象)
 6,   urllib(url请求处理)
 7，  time(有关时间计算)
+8，  asyncio(协程)
+9，  logging(日志处理)
