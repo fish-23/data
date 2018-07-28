@@ -1,0 +1,51 @@
+﻿bottle 实现文件上传(图片处理)
+
+1，html
+
+html_store = '''
+<html>
+<body>
+<form action="/api/v1/store" method="post" enctype="multipart/form-data">
+<fieldset>
+   <legend> <h1>产品录入 </h1></legend>
+产品名:<input type="text" name="name"/>
+产品数量:<input type="text" name="num"/>
+产品缩略图:<input type="file" name="pic" />
+<input type="submit" value="增加"/>
+</form>
+</body>
+</html>
+'''
+
+
+2，将图片接收后保存到本地(str 类型)
+
+@route('/api/v1/store', method='POST')
+def store():
+        # 接收图片文件
+        pic = request.files.get('pic')
+        # 用os.path.splitext方法把文件名和后缀分离
+        name, ext = os.path.splitext(pic.filename)
+        # 修改文件名
+        pic.filename = ''.join(('123',ext))
+        # 保存图片
+        pic.save('/root',overwrite=True)
+
+
+
+3，将图片接收后保存到本地(bytes 类型)
+
+@route('/api/v1/store', method='POST')
+def store():
+        # 接收前端传来的所有文件，并编码成utf-8
+        postValue = bottle.request.POST.decode('utf-8')
+        # 取出图片文件(<class 'bottle.FileUpload'>)
+        pic = bottle.request.POST.get('pic')
+        # 读取文件(bytes 类型)
+        pic = pic.file.read()
+        # =用在URL、Cookie里面会造成歧义，很多Base64编码后会把=去掉，此时加上=
+        pic = base64.b64decode(str(pic) + '='*(4-len(pic)%4))
+        # 保存文件
+        file=open('/root/789.jpg','wb')
+        file.write(pic)
+        file.close()
