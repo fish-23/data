@@ -1,0 +1,48 @@
+﻿1，(1) python在执行import语句时，到底进行了什么操作
+       (1) 创建一个新的，空的module对象
+       (2) 把这个module对象插入sys.module中
+       (3) 装载module的代码（需要先找到module的位置）
+       (4) 执行新的module中对应的代码
+   (2) python查找module位置：
+       (1) 当前目录下
+       (2) 在环境变量PYTHONPATH中查找
+       (3) python的默认安装路径，通常是/usr/local/lib/python
+   (3) 可以被import导入的对象
+       (1) 内建模块（使用C编写并已链接到Python解释器中）
+       (2) 模块文件（.py文件）
+       (3) 包（包含多个模块）
+       (4) C或C++扩展（已编译为共享库或DLL文件）
+   
+
+2，(1) __init__.py文件的作用：将文件夹变为一个Python模块的包，我们在导入一个包时，实际上是导入了它的__init__.py文件
+   (2) 我们在一个模块的__init__.py文件中定义所需的模块，当另外一个文件导入这个包时，也会导入定义的模块
+   (3) 示例
+       # package
+       # __init__.py
+         import re
+         import urllib
+         import sys
+         import os
+       # a.py
+         import package 
+         print(package.re, package.urllib, package.sys, package.os)
+       # b.py
+         from package import *
+         print(re, urllib, sys, os)
+    (4) __init__.py中还有一个重要的变量，__all__, 它用来将模块全部导入
+       # 示例
+       # __init__.py
+         __all__ = ['os', 'sys', 're', 'urllib']
+
+         
+3，关于.pyc 文件 与 .pyo 文件
+   (1) .pyc(.py文件的汇编生成的字节代码)
+   (2) .pyo(在解释器使用-O选项时，将使用同名的.pyo文件，这个文件去掉了断言、断行号以及其他调试信息，体积更小，运行更快)
+
+
+
+
+
+
+
+
