@@ -1,0 +1,25 @@
+﻿import os
+os.name # posix  # 操作系统类型，posix表示Linux，nt表示Windows
+os.uname() # 查看操作系统详情
+os.environ # 查看环境变量的配置情况
+os.getenv() # 获取一个环境变量，如果没有返回none
+os.putenv(key, value) # 设置一个环境变量值
+
+
+os.path.abspath('.')  # /home/fish  # 查看当前目录的路径
+os.getcwd()  # /root/wlp # 得到当前工作目录，即当前Python脚本工作的目录路径
+os.listdir('/root') # ['1.txt', '3.py'] # 返回指定目录下的所有文件和目录名
+os.path.join('/home/fish', 'sea')  # 连接目录与文件名或目录
+os.mkdir('/home/fish/sea')  # 在当前目录下创建目录 sea 如果目录存在会报错
+os.rmdir('/home/fish/sea')  # 删除目录
+os.remove('/root/1.py') # 函数用来删除一个文件
+os.system('rm -rf 7.py') # 函数用来运行shell命令
+
+# 合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作
+os.path.split('/home/fish/1.py')   # ('/home/fish', '1.py')  # 用于拆分路径，后一部分总是最后级别的
+os.path.splitext('/home/fish/1.py')  # ('/home/fish/1', '.py')   # 分离文件名与扩展名
+# 文件
+os.rename('test.txt', 'test.py') # 对文件进行重命名
+os.remove('test.py')  # 删除文件
+[x for x in os.listdir('.') if os.path.isdir(x)]  # 列出当前路径下的目录
+[x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py'] # 列出当前目录下的py文件
