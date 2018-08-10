@@ -133,7 +133,9 @@
        print('return is', futu.result())   # return is end
        print('ret is', ret )    # ret is end
        loop.close
-
+       # 项目实际操作结果：futu.result() 返回的类型是tuple  tuple类型里面数据的类型是set类型，协程返回的数据在result=后面
+       # ({<Task finished coro=<hello() done, defined at /root/store_user.py:85> result='end'>, <Task finished coro=<hello()                 done, defined at /root/store_user.py:85> result='end'>}, set())
+       
        
 4，添加回调：
   （1）添加回调函数后，当一个协程执行完成，会得到通知
