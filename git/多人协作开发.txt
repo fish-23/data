@@ -1,0 +1,13 @@
+﻿1，克隆远程仓库
+     git clone https://github.com/fish-23/store
+     git checkout -b dev origin/dev
+2,  队友在master分支更新了内容，如何合并到本地dev分支
+     git checkout master
+     git pull 
+     git checkout dev
+     git merge master 
+3，Pull Request 的流程
+     fork对方的代码
+     修改代码并提交
+     点击 pull request
+     点击 create pull request
