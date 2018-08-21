@@ -1,6 +1,6 @@
-# touch error.py
+ï»¿# touch error.py
 chinese_msg = {}
-chinese_msg[-1] = 'ÓÃ»§Ãû´íÎó'
+chinese_msg[-1] = 'ç”¨æˆ·åé”™è¯¯'
 
 ERR = chinese_msg
 
@@ -10,7 +10,7 @@ url = {}
 url['login'] = '/login'
 
 url_chinese_msg = {}
-url_chinese_msg['login'] = 'µã»÷µÇÂ¼'
+url_chinese_msg['login'] = 'ç‚¹å‡»ç™»å½•'
 
 URL = url
 URL_MSG = url_chinese_msg
