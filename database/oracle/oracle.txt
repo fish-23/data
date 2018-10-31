@@ -1,0 +1,32 @@
+1，用户
+（1）用户及登录   
+     （1）system  和 sys  是系统管理员，sys只能用sysdba的方式登录  scott 默认的密码是 tiger
+     （2）sys/123 @orcl  as sysdba    
+          # 登录数据库   用户名/密码  @后面是全局数据库名或者ip地址  as 后面是以什么权限登录
+     （3）connect sys/123 as sysdba  
+          # 第二种登录方法
+     （4）show user 
+          # 查看登录用户 
+     （5）dba_users 数据字典。数据字典是数据库提供的表，用于查看数据库的信息
+     （6）desc  dba_users  
+          # 查看数据字典的结构
+     （7）select username from dba_users  
+          # 查看数据库里面的用户
+     （8）alter scott account unlock   
+          # 启用scott用户  unlock表示解锁，lock表示锁定 
+（2）表空间
+     （1）表空间与数据库的关系：表空间是数据库的逻辑部分，开辟的空间用来存储数据库的文件
+     （2）表空间与数据文件：表空间是由一个或者多个数据文件来构成的
+     （3）表空间分类
+            # 永久表空间：存储表，视图，存储过程这些
+            # 临时表空间：执行过程中生成的过程，执行完成会释放
+            # UNDO表空间：用来存储修改前的数据，用来数据回滚
+     （4）dba_tablespaces  dba_users  系统管理员级别的数据字典   
+     （5）user_tablespaces user_users  普通用户级别的数据字典
+     （6）select tablespace from  dba_tablespaces 
+          # system  系统表空间
+          # sysaux  数据库事例表空间
+          # temp    临时表空间
+          # users   永久性，用户创建数据库对象
+     （7）select dafault_tablespace,temporary_tablespace from dba_users where username='system'
+          # 查看默认表空间和临时表空间
