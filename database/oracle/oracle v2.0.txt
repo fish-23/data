@@ -1,0 +1,33 @@
+﻿1，sqlplus 使用
+（1）登录 sqlplus 用户名/密码
+（2）环境设置（格式化指令）
+    （1）set linesize 300;
+         # 每行的长度 
+    （2）set pagesize 30;
+         # 设置每页显示的数据行数 
+    （3）col ename for a10;
+         # col 表示对列进行操作
+         # 设置ename字段长度为10，a后面就是字段长度，结果是所有表的ename字段都是10了
+（3）运行脚本文件 @文件名 (文件必须是 .sql的文件)
+（4）connect sys/123 as sysdba 
+     # 切换用户 sys用户只能用sysdba的方式登录 
+（5）host echo hello world;
+     host copy d:\1.py d:\2.py
+     # hello word
+     # copy 复制
+     # host 命令用来调用系统同命令，相当于 os.system()
+     # 在Windows环境下，echo和print一个意思
+
+2，scott用户
+（1）select * from scott.emp;
+     # emp表只属于 scott用户，如果不是这个用户登录，用这个语句查询
+（2）select * from tab;
+     # 查看当前用户账号下的所有表
+（3）desc dept;
+     # 查看dept表的表结构
+（4）该用户下面的四张表
+    （1）dept 部门表  3个字段  deptno(部门编号)，dname(部门名称)，loc(部门位置)
+    （2）emp 雇员信息表  empno(雇员编号) ename(雇员姓名) job(雇员职位) mgr(雇员领导编号)
+                         hiredate(雇佣日期) sal(基本工资) comm(佣金) deptno(部门编号)
+    （3）salgrade 工资等级表   grade(工资等级) losal(最低工资) hisal(最高工资) 
+    （4）bonus 工资表  ename(姓名) job(职位) sal(基本工资) comn(佣金) 没数据
