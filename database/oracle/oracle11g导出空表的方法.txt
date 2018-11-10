@@ -1,0 +1,278 @@
+﻿解决Oracle 11g在用EXP导出时，空表不能导出的问题
+2016年11月11日 14:22:34 黄豆子 阅读数：6833更多 
+个人分类： Oracle 
+
+一、问题原因： 
+    11G中有个新特性，当表无数据时，不分配segment，以节省空间 
+    1、insert一行，再rollback就产生segment了。 
+
+        该方法是在在空表中插入数据，再删除，则产生segment。导出时则可导出空表。 
+
+    2、设置deferred_segment_creation 参数 
+
+       show parameter deferred_segment_creation 
+
+   NAME                                 TYPE        VALUE 
+
+   ------------------------------------ ----------- ---------- 
+
+   deferred_segment_creation            boolean     TRUE 
+
+   SQL> alter system set deferred_segment_creation=false; 
+
+   系统已更改。 
+
+   SQL> show parameter deferred_segment_creation 
+
+   NAME                                 TYPE        VALUE 
+
+   ------------------------------------ ----------- ---------- 
+
+
+   deferred_segment_creation            boolean     FALSE 
+
+    该参数值默认是TRUE，当改为FALSE时，无论是空表还是非空表，都分配segment。 
+
+    需注意的是：该值设置后对以前导入的空表不产生作用，仍不能导出，只能对后面新增的表产生作用。如需导出之前的空表，只能用第一种方法。 
+
+二、解决方法： 
+
+    1、先查询一下当前用户下的所有空表 
+
+      select table_name from user_tables where NUM_ROWS=0; 
+
+    2、用以下这句查找空表 
+
+      select 'alter table '||table_name||' allocate extent;' from user_tables where num_rows=0 
+
+       把查询结果导出，执行导出的语句 
+
+      'ALTERTABLE'||TABLE_NAME||'ALLOCATEEXTENT;' 
+
+      ----------------------------------------------------------- 
+
+      alter table AQ$_AQ$_MEM_MC_H allocate extent; 
+
+      alter table AQ$_AQ$_MEM_MC_G allocate extent; 
+
+      alter table AQ$_AQ$_MEM_MC_I allocate extent; 
+
+      alter table AQ$_AQ_PROP_TABLE_T allocate extent; 
+
+      alter table AQ$_AQ_PROP_TABLE_H allocate extent; 
+
+      alter table AQ$_AQ_PROP_TABLE_G allocate extent; 
+
+      alter table AQ$_AQ_PROP_TABLE_I allocate extent; 
+
+      alter table AQ$_KUPC$DATAPUMP_QUETAB_T allocate extent; 
+
+      alter table AQ$_KUPC$DATAPUMP_QUETAB_H allocate extent; 
+
+      alter table AQ$_KUPC$DATAPUMP_QUETAB_G allocate extent; 
+
+      alter table AQ$_KUPC$DATAPUMP_QUETAB_I allocate extent; 
+
+    3、然后再执行 
+
+       exp 用户名/密码@数据库名 file=/home/oracle/exp.dmp log=/home/oracle/exp_smsrun.log   成功！ 
+
+
+ORACLE 11G在用EXPORT导出时，空表不能导出。 
+
+11G中有个新特性，当表无数据时，不分配segment，以节省空间 
+
+　　解决方法： 
+　　1、insert一行，再rollback就产生segment了。 
+　　该方法是在在空表中插入数据，再删除，则产生segment。导出时则可导出空表。 
+
+　　2、设置deferred_segment_creation 参数 
+　　该参数值默认是TRUE，当改为FALSE时，无论是空表还是非空表，都分配segment。 
+
+　　需注意的是：该值设置后对以前已经存在的空表不产生作用，仍不能导出，只能对后面新增的表产生作用。如需导出之前的空表，只能用第一种方法】 
+
+觉得不是解决方法，然后就用了expdp和impdp 
+create directory expdp_dir as   '/data/app1/dp'; 
+grant read,write on directory expdp_dir to DRGN_OWNER; 
+
+expdp DRGN_OWNER/DRGN_OWNER DIRECTORY=expdp_dir DUMPFILE=DRGN_OWNER.dmp SCHEMAS=DRGN_OWNER logfile=DRGN_OWNERexpdp.log 
+
+create directory impdp_dir as '/data/app1/dp'; 
+grant read,write on directory impdp_dir to DRGN_OWNER; 
+
+impdp DRGN_OWNER/DRGN_OWNER DIRECTORY=impdp_dir DUMPFILE=DRGN_OWNER.dmp logfile=DRGN_OWNER.dmpimpdp.log 
+
+空表果然已经导入了 
+
+对于DBA新建数据库，我个人建议，建立了空的数据库后，马上执行 
+alter system set deferred_segment_creation=flase sscope=spfile; 
+shutdowm immediate 
+startup 
+
+
+
+
+【总结】 
+1、自己没有好好学习11g的新特性，导致了这个问题花费了2个小时的 
+2、建议客户使用稳定的10.2.0.4，客户拒绝，现在11g已经是主流了，并不是每一个客户都很保守使用稳定版本，而非最新版本 
+3、某美 和 某ELL 的项目以后少接触，4年前IBM P570双机Oracle10g的实施问题就折腾的无语。 
+4、再次论证了很多甲方和厂商基本都是：事前猪一样，事后诸葛亮。和目前国内流行的砖家叫兽有异曲同工之妙。 
+5、做技术果然是一条不归之路 
+
+
+
+在Oracle 11g中，exp默认不能导出空表。用传统的exp，imp进行异构平台数据库迁移会比较麻烦。不过可以使用expdp、impdp进行迁移。 
+
+把64位windows 2003的Oracle11gR2数据库迁移到64位Linux RedHat Enterprise 5中，可以使用expdp、impdp进行迁移数据。 
+
+如：Windows为A服务器，Linux为B服务器,数据库用户为test，把A服务器的数据迁移到B服务器中 
+
+
+在A服务器操作： 
+
+1、 
+
+SQL> create directory expdp_dir as 'D:\mzl\backup '; 
+
+SQL> grant read,write on directory expdp_dir to test； 
+
+2、在windows目录创建目录D:\mzl\backup 
+
+3、在DOS命令窗口导出： 
+
+expdp test/test DIRECTORY=expdp_dir DUMPFILE=test.dmp logfile=testexpdp.log 
+
+在B服务器中操作： 
+
+4、SQL> create directory impdp_dir as '/home/oracle/impdp_dir'; 
+
+  SQL> grant read,write on directory impdp_dir to test； 
+
+1、 在系统中需要有/home/oracle/impdp_dir目录，在impdp_dir目录下必须有读写权限 
+
+（chmod 777 impdp_dir） 
+
+5、用ftp把A服务器导出的数据上传到B服务器的/home/oracle/impdp_dir目录中 
+
+在A服务器中配置好B服务器的服务器名,在A服务器导入数据 
+
+6、在DOS命令窗口导出： 
+
+impdp test/test@B_database DIRECTORY=impdp_dir DUMPFILE=test.dmp logfile=testimpdp.log 
+
+（这里注意大小写，如果test.dmp在linux中为大写，必须更改为大写。Linux区分大小写） 
+
+
+
+本篇文章来源于 Linux公社网站(www.linuxidc.com)  原文链接：http://www.linuxidc.com/Linux/2011-08/41146.htm 
+
+  在oracle 11g r2中，发现传统的exp居然不能导出空的表，然后查询一下， 
+发现需要如下的步骤去搞，笔记之。 
+
+oracle 11g 新增了一个参数：deferred_segment_creation，含义是段延迟创建，默认是true。具体是什么意思呢？ 
+
+如果这个参数设置为true，你新建了一个表T1，并且没有向其中插入数据，那么这个表不会立即分配extent，也就是不占数据空间，只有当你insert数据后才分配空间。这样可以节省少量的空间。 
+
+解决办法 
+
+1 设置deferred_segment_creation 参数为FALSE后，无论是空表还是非空表，都分配segment。 
+
+   在sqlplus中，执行如下命令： 
+
+   SQL>alter system set deferred_segment_creation=false; 
+
+   查看： 
+   SQL>show parameter deferred_segment_creation; 
+
+
+   该值设置后只对后面新增的表产生作用，对之前建立的空表不起作用。 
+
+   注意并且要重新启动数据库，让参数生效 
+
+2  使用ALLOCATE EXTENT的说明 
+
+
+   使用ALLOCATE EXTENT可以为数据库对象分配Extent。其语法如下： 
+
+   ----------- 
+   ALLOCATE EXTENT { SIZE integer [K | M] | DATAFILE 'filename' | INSTANCE integer } 
+    ----------- 
+
+   可以针对数据表、索引、物化视图等手工分配Extent。 
+
+   ALLOCATE EXTENT使用样例: 
+
+    ALLOCATE EXTENT 
+    ALLOCATE EXTENT(SIZE integer [K | M]) 
+    ALLOCATE EXTENT(DATAFILE 'filename') 
+    ALLOCATE EXTENT(INSTANCE integer) 
+    ALLOCATE EXTENT(SIZE integer [K | M]   DATAFILE 'filename') 
+    ALLOCATE EXTENT(SIZE integer [K | M]   INSTANCE integer) 
+   
+
+    针对数据表操作的完整语法如下： 
+
+   ----------- 
+    ALTER TABLE [schema.]table_name ALLOCATE EXTENT [({ SIZE integer [K | M] | DATAFILE 'filename' | INSTANCE integer})] 
+    ----------- 
+
+
+    故，需要构建如下样子简单的SQL命令： 
+
+   ----------- 
+   alter table aTabelName allocate extent 
+   ----------- 
+
+
+
+3.2 构建对空表分配空间的SQL命令， 
+
+
+    查询当前用户下的所有空表（一个用户最好对应一个默认表空间）。命令如下： 
+
+   ----------- 
+   SQL>select table_name from user_tables where NUM_ROWS=0; 
+   ----------- 
+
+
+   根据上述查询，可以构建针对空表分配空间的命令语句，如下： 
+
+   ----------- 
+   SQL>Select 'alter table '||table_name||' allocate extent;' from user_tables where num_rows=0 
+    ----------- 
+
+
+   批量输出上述生成的SQL语句，建立C:\createsql.sql，其内容如下： 
+
+   ----------- 
+   set heading off; 
+   set echo off; 
+   set feedback off; 
+   set termout on; 
+   spool C:\allocate.sql; 
+   Select 'alter table '||table_name||' allocate extent;' from user_tables where num_rows=0; 
+    spool off; 
+   ----------- 
+
+
+   执行C:\createsql.sql，命令如下： 
+   ----------- 
+   SQL>@ C:\createsql.sql; 
+   ----------- 
+
+   执行完毕后，得到C:\allocate.sql文件。 
+
+   打开该文件会看到，已经得到对所有空表分配空间的命令SQL语句。 
+
+
+3.4 执行SQL命令，对空表分配空间： 
+
+   执行C:\allocate.sql，命令如下： 
+   ----------- 
+   SQL>@ C:\allocate.sql; 
+   ----------- 
+  
+   执行完毕，表已更改。 
+
+
+3.4 此时执行exp命令，即可把包括空表在内的所有表，正常导出。 
