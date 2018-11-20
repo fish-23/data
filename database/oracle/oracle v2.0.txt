@@ -1,4 +1,31 @@
-﻿1，sqlplus 使用
+﻿1，基础
+（1）概念
+     （1）实例：一组Oracle后台进程和分配的共享内存区域
+     （2）数据库：由数据文件，控制文件，日志文件，参数文件和归档文件组成
+     （3）数据库服务器：实例，数据库和管理数据库的软件组成(sqlplus)
+     （4）实例由于管理数据源库，一个实例只能装载和打开一个数据库
+     （5）
+（2）用户及登录   
+     （1）system  和 sys  是系统管理员，sys只能用sysdba的方式登录  scott 默认的密码是 tiger
+     （2）sys/123 @orcl  as sysdba    
+          # 登录数据库   用户名/密码  @后面是全局数据库名或者ip地址  as 后面是以什么权限登录
+     （3）connect sys/123 as sysdba  
+          # 第二种登录方法
+     （4）show user; 
+          # 切换登录用户 
+     （5）dba_users 数据字典。数据字典是数据库提供的表，用于查看数据库的信息
+     （6）desc  dba_users;  
+          # 查看数据字典的结构
+     （7）select username from dba_users;  
+          # 查看数据库里面的用户
+     （8）alter scott account unlock;   
+          # 启用scott用户  unlock表示解锁，lock表示锁定 
+          alter user scott identified by tiger account unlock;
+          # 这个命令在非登录状态可以操作
+          # tiger 是 scott用户的密码
+
+
+2，sqlplus 使用
 （1）登录 sqlplus 用户名/密码
 （2）环境设置（格式化指令）
     （1）set linesize 300;
@@ -18,7 +45,7 @@
      # host 命令用来调用系统同命令，相当于 os.system()
      # 在Windows环境下，echo和print一个意思
 
-2，scott用户
+3，scott用户
 （1）select * from scott.emp;
      # emp表只属于 scott用户，如果不是这个用户登录，用这个语句查询
 （2）select * from tab;
@@ -31,3 +58,38 @@
                          hiredate(雇佣日期) sal(基本工资) comm(佣金) deptno(部门编号)
     （3）salgrade 工资等级表   grade(工资等级) losal(最低工资) hisal(最高工资) 
     （4）bonus 工资表  ename(姓名) job(职位) sal(基本工资) comn(佣金) 没数据
+
+
+4，查询
+（1）select distinct name,job,age from users;
+     # 去重查询,只有当distinct name,job,age这三个字段完全相同，才会显示一条
+（2）select distinct name,age*12 ages from users;
+     # 给 age*12起别名 ages 查询的结果中，列就是ages 而不是 age*12
+（3）查询语句中设置常量
+    （1）字符串常量
+        （1）select '信息',name,age from users;
+             # 常量是字符串，用单引号来表示
+             # fish是常量，查询结果中会原封不动的输出
+        （2）select name||age from users;
+             # 在查询语句中，使用 || 来连接查询结果
+             # 上面查询的结果那么字段和age字段会合并到一个字段来显示
+        （3）select  '姓名：' || name || '年龄：' || age  info from users;
+             # 连接查询结果，常量，别名综合运用
+    （2）如果常量是数字，直接写
+    （3）如果常量是时间，按照时间格式来写
+
+4，限定查询
+
+（1）查询运算符
+     （1）范围运算符： between....and 
+     （2）谓词运算符： in  notin
+     （3）空判断：is..null    is..not..null
+     （4）模糊查询：like
+（2） between....and 
+    （1）select * from users where age between 25 and 30;
+        # 查询年龄在25到30之间的用户
+     （2）select * from users where birth between '01-1月-1981' and '31-12月-1981'
+        # 查询出用户表中生日在1981年的数据
+（3）in
+     （1）select * from users where id in (1,3,5);
+        # in操作，使用in操作和null时要注意
