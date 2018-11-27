@@ -177,7 +177,8 @@
               alter table product add column id int auto_increment not null primary key
                 # 在product表里面增加字段id   auto_increment选项，每添加一条数据，id字段会自动增加1
                 # not null  和  primary key 定义auto_increment字段需要添加这两个选项
-       (2) 浮点数类型：float(4个字节)，double(8个字节)   
+       (2) 浮点数类型：float(4个字节)，double(8个字节)
+           (1)浮点数在计算时会有误差，对精度要求高的计算，应该使用定点数 
        (3) 定点数类型：decimal(字节由(M,D)来确定)   
            (1)  (M,D)  M(精度) (表示整数和小数的位数和)   D(标度)(表示小数位数)  
            (2)  浮点数类型，不加精度和标度，会自动存储数据，不会报错。加上精度和标度，会四舍五入达到标度和精度的要求
@@ -407,4 +408,3 @@
                       外键约束(teacher)：alter table middle add foreign key(tea_id) references teacher(id) on delete cascade on update cascade;         
                  (6) 关闭外键约束：set foreign_key_checks = 0;
                       打开外键约束：set foreign_key_checks = 1;    
-            (5) 
