@@ -1,0 +1,9 @@
+1，下载配置参考文件：https://blog.csdn.net/hunan961/article/details/79484098
+
+2，win10版本更新地址：https://www.microsoft.com/zh-cn/software-download/windows10
+
+3，备注：
+   (1) docker帐号注册的时候需要翻墙
+   (2) 查看win10版本 运行输入dxdiag 回车
+   (3) 安装后打开cmd就可以使用
+     

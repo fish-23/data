@@ -14,3 +14,34 @@
         # 查看所有的字符集和默认的校对规则
     (4) select * from information_schema.COLLATIONS;
         # 查看所有的校对规则
+（4）字符集和校对规则查看
+    (1) 服务器
+        (1) 设置：在 my.cnf中 [mysql] character-set-server=gbk
+        (2) 查看字符集：show variables like 'character_set_server'
+        (3) 查看校对规则：show variables like 'collation_server';
+        (4) 服务器的默认字符集：latin1   默认校对规则：latin1_swedish_ci
+    (2) 数据库
+        (1) 查看字符集：show variables like 'character_set_database';
+        (2) 查看校对规则：show variables like 'collation_database';
+    (3) 数据表
+        (1) show create table user \G
+            # 查看user表的字符集和校对规则
+（5） 字符集更改(在原数据库有数据的基础上，更改字符集)(utf8改成gbk)
+    (1) 导出表结构
+       mysqldump -uroot -proot --default-character-set=gbk -d wlp > createtab.sql
+       # --default-character-set=gbk   表示以gbk的字符集连接
+       # -d 表示只导出表结构，不导出数据
+    (2) 修改 createtab.sql 中定义的字符集为新的字符集(需要更改所有表的字符集,如果需要可以定义校对规则)
+    (3) 导出所有的记录
+       mysqldump -uroot -proot --quick --no-create-info --extended-insert --default-character-set=utf8 wlp > data.sql
+       # --quick 用于快速的转储大的表
+       # --no-create-info 不导出所有表的create table 语句
+       # --extended-insert 使转储文件更小，重载文件时更迅速
+       # --default-character-set=utf8 以原有的字符集导出数据，使得文件不会乱码
+    (4) 打开 data.sql 将set names utf8 修改成 set names gbk
+    (5) 使用新的字符集创建数据库
+       create database wlp2 default charset gbk;
+    (6) 创建表，执行 createtab.sql
+       mysql -uroot -proot wlp2 < createtab.sql;
+    (7) 导入数据，执行 data.sql
+       mysql -uroot -proot wlp2 < data.sql;
