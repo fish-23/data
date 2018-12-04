@@ -45,3 +45,12 @@
        mysql -uroot -proot wlp2 < createtab.sql;
     (7) 导入数据，执行 data.sql
        mysql -uroot -proot wlp2 < data.sql;
+
+
+9,索引
+（1）基础
+    (1) mysql目前支持的索引有 前缀索引(btree) 和 全文本索引(fulltext)
+    (2) 前缀索引：对索引字段的前n个字符创建索引。myisam(最大1000字节长度)，innodb(767字节)
+    (3) 全文本索引：进行全文搜索,只有myisam支持
+（2）索引创建删除
+    
