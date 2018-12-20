@@ -9,7 +9,7 @@
         mysql_secure_installation  (对mariadb进行设置)
         备注：https://blog.csdn.net/jxq0816/article/details/79797304
 （2）卸载
-        yum -y remove mari*    (卸载mysql)
+        yum -y remove mari*    (卸载mysql, 这个方法有危险，最好拼写全名，否则有可能卸载 mario 这样的程序)
         rm -rf /var/lib/mysql/*  (删除相关文件)
 
 
@@ -36,8 +36,10 @@
 （3）表操作
       (1) show tables;（产看数据库中的表）
       (2) create table user(name varchar(10), time datetime, balance int(2)); （创建数据表）
+      (2.1) 一般会需要指定 primary key，主键。以及 default 值，和允许不允许 null
+      (2.2) 创建索引也可以在创建数据库的同时创建。
          # user：数据库名  name,time,balance：字段名  varchar(10)，datetime，int(2)：字段类型
-      (3) drop table user; （删除数据表）
+      (3) drop table user; （删除数据表）,如果有外键，可能会删除失败
 （4）结构
       (1) desc user; （产看表结构）
       (2) show create table user; （查看表创建过程）
