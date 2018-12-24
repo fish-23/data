@@ -41,7 +41,7 @@
          （3）内嵌IPv4地址表示法：为了实现IPv4-IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:X:X:X:X:X:d.d.d.d
                                                   前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，
                                                   例如    ::192.168.0.1    ::FFFF:192.168.0.1
-		代码实现：
+		代码实现： 参考：https://docs.python.org/3/library/ipaddress.html
 		root@localhost:~# python3
 		Python 3.5.2 (default, Nov 12 2018, 13:43:14)
 		[GCC 5.4.0 20160609] on linux
@@ -53,8 +53,24 @@
 		b'\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
 		>>> ipaddress.ip_address('1::1:1.2.3.4').packed
 		b'\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x01\x02\x03\x04'
+		>>> ipaddress.ip_address('::ff:ff:1.2.3.4').version
+		6
+		>>> ipaddress.ip_address('1.2.3.4').version
+		4
+		>>> ipaddress.ip_address('::ffff:1.2.3.4').ipv4_mapped
+		IPv4Address('1.2.3.4')
+		>>> for ip in ipaddress.IPv4Network('1.2.3.0/29'):
+		...     ip
+		...
+		IPv4Address('1.2.3.0')
+		IPv4Address('1.2.3.1')
+		IPv4Address('1.2.3.2')
+		IPv4Address('1.2.3.3')
+		IPv4Address('1.2.3.4')
+		IPv4Address('1.2.3.5')
+		IPv4Address('1.2.3.6')
+		IPv4Address('1.2.3.7')
 		>>>
-
 
 
 4，子网掩码：用来指明一个IP地址的哪些位标识的是主机所在的子网，以及哪些位标识的是主机的位掩码。
