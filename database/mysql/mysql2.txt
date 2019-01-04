@@ -100,8 +100,9 @@
       （1）show index from t1;
               # 查t1表中所有的索引
       （2）alter table t1 add index sy1(name);
-              create index sy1 on t1(name);
+              create index sy1 on t1(name(20));
               # 给t1表上的name字段创建索引的两种方法
+              # name后面的20是设置的前缀长度，这时候检检索时会对前20个自读进行检索
               alter table cs add primary key sy3(h0);
               # 创建主键索引(经测试用 create 语句没法创建，只能用这一种方法创建主键索引)
               alter table cs change column h0 h0 int not null primary key auto_increment;
@@ -113,3 +114,55 @@
               # 删除主键 当主键设置了自增长，这时候需要更改主键字段类型，取消自增长，然后再进行删除
               # alter table cs modify h0 int;
               # alter table cs drop primary key;
+
+（4）索引设计的原则
+      （1）最适合索引的列是出现在where后面的列
+      （2）如果对字符串进行索引，应该指定一个前缀长度
+      （3）每个额外的索引都要占用额外的磁盘空间，并降低读写性能，因此索引不能设计的太多。
+
+
+10，视图
+（1）基础：
+         (1)  什么是视图：视图是一种虚拟存在的表，试图并不在数据库中实际存在，行和列的数据来自于自定义视图中使用的表，并且是在使用视图时动态生成的
+         (2)  视图的优势：
+               (1)  简单：使用视图的用户，不用担心视图涉及的表的结构，关联情况等信息，是过滤好的结果集
+               (2)  安全：只能访问特定的而结果集
+               (3)  数据独立：表增加列，增加关联对视图影响不大
+（2）试图创建
+        (1)  create or replace view fish_view as
+              select distinct  a.id, a.age, b.price, b.name
+              from users a join product b
+              where a.id = b.id;
+       (2) 备注：from后面不能跟子查询，如果需要，可已将子查询定义成一个视图，然后去调用该视图
+       (3) 定义好视图之后，视图的数据会根据所关联的表数据自动更新，也可以手动跟新视图里面的数据，这时候原表的数据也会改变
+            如果创建视图时有以下情况，就不可以进行手动更新
+            (1)  包含以下sql语句：聚合函数(sum,min,max,count)，distinct，group by，having，union，union all
+            (2)  常量视图
+            (3)  select 中包含子查询
+            (4)  jion
+            (5)  from 后面跟一个不能跟新的视图
+            (6)  where 后面的子查询引用了from里面的表
+      (4) 对视图更新的限制
+            (1)  with local check option  只要满足本视图就可以更新
+            (2)  with cascaded check option  满足包含的所有视图才可以更新、
+            (3)  eg:
+                     (1)  create or replace view fish_view as
+                           select id, num from payment
+                           where num < 10 with check option
+
+                     (2)  create or replace view fish1_view as
+                           select id, num from fish_view 
+                           where num > 5 with local check option
+        
+                     (3)  create or replace view fish2_view as
+                           select id, num from fish_view 
+                           where num > 5 with local check option
+      
+                     (4)  update fish1_view set num=11   # 可以正常执行
+                           update fish2_view set num=11   # 没法执行
+
+（3）试图删除
+       (1)  drop view fish_view
+
+（4）试图查看
+       (1)  show tables;       show create view fish_view;
