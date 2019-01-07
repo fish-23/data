@@ -1,0 +1,76 @@
+1，centos7安装python3
+    （1）安装前信息查看
+            (1) python -V            # 查看是否安装了python 
+            (2) which python      # 查看python可执行文件的路径  
+            (3) ls -al python*      # 产看python的指向
+    （2）安装python3依赖包
+            yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make
+    （3）python3安装
+            (1) 下载安装包：wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tar.xz
+                    # wget    linux命令，用于下载文件
+                    # https://www.python.org/ftp/python/     python下载地址
+                    # 3.7.2   版本号     Python-3.7.2.tar.xz   python压缩包
+            (2)  解压：tar -xvJf  Python-3.7.2.tar.xz
+            (3)  进入文件夹：cd Python-3.7.2
+            (4)  编译安装  
+                  ./configure prefix=/usr/local/python3
+                  make && make install
+            (5)  创建python软连接
+                  ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+     (4) 如果想用python 调用python3    用python2调用python2.7
+          (1)  备份python文件夹   mv python python.bak  切记在执行下面命令之前执行该命令
+          (2)  6-(3)-(5)  需要改成ln -s /usr/local/python3/bin/python3 /usr/bin/python
+          (3)  因为执行yum需要python2版本，所以我们还要修改yum的配置
+                (1)  vim /usr/bin/yum    把#! /usr/bin/python修改为#! /usr/bin/python2
+                (2)  vim /usr/libexec/urlgrabber-ext-down   把#! /usr/bin/python修改为#! /usr/bin/python2
+
+2，centos7安装卸载mariadb
+（1）安装
+        yum -y install mariadb mariadb-server  (安装mariadb)
+        systemctl start mariadb  (启动mariadb)
+        systemctl enable mariadb  (设置开机启动)
+        mysql -u root  (登录数据库)
+        set password for 'root'@'localhost' =password('root')  (设置root用户密码为root)
+        备注：https://blog.csdn.net/jxq0816/article/details/79797304
+（2）卸载
+        yum -y remove mari*    (卸载mysql, 这个方法有危险，最好拼写全名，否则有可能卸载 mario 这样的程序)
+        yum -y remove mariadb mariadb-server
+        rm -rf /var/lib/mysql/*  (删除相关文件)
+
+3，centos7安装mysql
+（1）yum -y install mysql mysql-devel
+（2）安装 mysql-server
+        (1) 下载：wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+        (2) 安装下载的rpm包： rpm -ivh mysql-community-release-el7-5.noarch.rpm
+        (3) 继续安装：yum -y  install mysql-community-server
+        (4) 启动mysql服务：service mysqld restart
+（3）设置root密码
+        (1) mysql -u root 
+        (2) set password for 'root'@'localhost' =password('root')
+（4）配置字符集
+        (1) vim /etc/my.cnf    在 [mysql]下面添加default-character-set =utf8 
+（5）备注：https://www.baidu.com/link?url=jLLuKFVpDEZrrGJnQ0y9xc93J3GJJDss7hPA57eJmglyjXuzcxxJ7uxUtv9aIJNL
+                  feuvMIR3QesC2oXXsFMyT_&wd=&eqid=f4c13cc7000107ab000000035c33092c
+（6）卸载
+       (1) 卸载yum装的服务
+             (1)  yum remove mysql mysql-server mysql-libs compat-mysql51
+             (2)  rm -rf /var/lib/mysql
+             (3)  rm /etc/my.cnf
+       (2) 如果通过rpm方式安装的mysql
+             (1)  查看系统中是否以rpm包安装的mysql：
+                   (1) rpm -qa | grep -i mysql
+                        # MySQL-server-5.6.17-1.el6.i686
+                        # MySQL-client-5.6.17-1.el6.i686
+             (2)  卸载mysql服务(上面显示出来的都卸载)：
+                   (1) rpm -e  MySQL-server-5.6.17-1.el6.i686
+                   (2) rpm -e MySQL-client-5.6.17-1.el6.i686
+             (3)  删除mysql服务：
+                   (1) chkconfig --list | grep -i mysql
+                   (2) chkconfig --del mysql
+             (4)  删除分散mysql文件夹:
+                   (1) find / -name mysql
+                        # mysql: /usr/lib/mysql  /usr/share/mysql
+             (5)清空相关mysql的所有目录以及文件:
+                  (1) rm -rf /usr/lib/mysql
+                  (2) rm -rf /usr/share/mysql
+       (3) 备注：https://www.cnblogs.com/wanghuaijun/p/6398240.html

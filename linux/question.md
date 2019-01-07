@@ -1,5 +1,6 @@
 ### 1,用户切换
-    （1）输入su 用户名 回车 root用户需要设置密码。普通用户“$”，root用户“#”
+    （1）输入su 用户名 回车 root用户需要输入密码。普通用户“$”，root用户“#”
+
 ### 2，yum 安装软件时错误 Errno 14 Couldn't resolve host
     （1）需要开启网络服务   vi 进入 /etc/sysconfig/network-scripts/ifcfg-ens33  将onboot 改成yes
     （2）更改后重启网络服务 service network restart
