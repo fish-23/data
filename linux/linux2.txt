@@ -1,0 +1,82 @@
+备注：https://www.linuxprobe.com/
+1，系统操作命令
+（1）rpm(RPM软件包管理器)
+        (1) 一种用于互联网下载包的打包及安装工具，在编译安装过程中解决了多个软件之间的依赖关系
+        (2)  -q(查询包)  -a(验证包)  -e(卸载包)  -i(安装包)  -h(打印出过程)  -v(详细打印)  -U(升级包)
+              eg：rpm -e  MySQL-server       # 卸载软件MySQL-server
+              eg：rpm -qa  MySQL-server     # 查询所有被安装的软件MySQL-server，-qa后面必须跟软件全名               
+              eg：rpm -qa | grep -i mysql     # 查询出和mysql有关的，已经安装的软件
+              eg：rpm -ivh MySQL-server     # 用rpm的形式安装MySQL-server
+              eg：rpm -Uvh MySQL-server   # 更新软件MySQL-server
+
+（2）Yum软件仓库
+        (1) Yum软件仓库可以根据用户的要求分析出所需软件包及其相关的依赖关系，然后自动从服务器下载软件包并安装到系统
+        (2)  操作：
+              eg：yum install -y mysql          # 安装mysql
+              eg：yum reinstall -y mysql       # 重新安装mysql
+              eg：yum update -y mysql        # 升级(更新)mysql
+              eg：yum remove -y mysql       # 移除(卸载)mysql
+              eg：yum info mysql                 # 查看mysql软件包信息
+
+              eg：yum clean all                           # 清除所有仓库缓存
+              eg：yum check-update                   # 检查可更新的软件包
+              eg：yum grouplist                          # 查看系统中已经安装的软件包组
+              eg：yum groupinstall 软件包组        # 安装指定的软件包组
+              eg：yum groupremove 软件包组      # 移除指定的软件包组
+              eg：yum groupinfo 软件包组           # 查询指定的软件包组信息      
+
+（3） Systemd初始化进程
+        (1) 操作
+              eg：systemctl start mysql.service              # 启动mysql.service服务
+              eg：systemctl restart mysql.service           # 重启服务
+              eg：systemctl stop mysql.service              # 停止服务
+              eg：systemctl reload mysql.service           # 重新加载配置文件（不终止服务）
+              eg：systemctl status mysql.service            # 查看服务状态 
+              eg：systemctl enable mysql.service           #  开机自动启动
+              eg：systemctl disable mysql.service          #  开机不自动启动
+              eg：systemctl is-enabled mysql.service     # 查看服务是否开机自启 
+        (2) 跟多操作详见：https://www.cnblogs.com/zhming26/p/6155201.html
+
+2，常用系统工作命令
+（1）date
+      # 显示及设置系统的时间或日期   -s(设置时间)
+        eg：date    # Tue Jan  8 15:17:39 CST 2019    # 显示当前时间
+        eg：date "+%Y-%m-%d %H:%M:%S"    # 2019-01-08 15:18:13  # 按照年月日时分秒的形式现在时间
+        eg：date -s "20190108 8:30:00"             # 设置当前时间为2019-01-08 08:30:00
+        eg：date "+%j"    # 008    # 查看当前时间是今年的第几天
+（2）top
+      # 动态地监视进程活动与系统负载等信息   
+      #  -p(指定进程)
+        eg：
+        (1) top - 16:04:53 up 13 days, 22:54,  2 users,  load average: 0.01, 0.01, 0.00
+        (2) Tasks: 138 total,   2 running, 136 sleeping,   0 stopped,   0 zombie
+        (3) %Cpu(s):  1.7 us,  0.7 sy,  0.0 ni, 97.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+        (4) KiB Mem :   884936 total,    88288 free,   409328 used,   387320 buff/cache
+        (5) KiB Swap:        0 total,        0 free,        0 used.   265804 avail Mem 
+        第一行：(时间，负载)
+        # 系统时间(16:04:53)，系统运行时间(up 13 days, 22:54)，登录终端数(2 users)
+        # 系统负载(load average: 0.01, 0.01, 0.00)（三个数值分别为1分钟、5分钟、15分钟内的平均值，数值越小意味着负载越低）
+        第二行：(进程)
+        # 进程总数(Tasks: 138 total)，运行中的进程数(2 running)，睡眠中的进程数( 136 sleeping)，停止的进程数( 0 stopped)，僵死的进程数(0 zombie)
+        第三行：(cpu占用率)
+        # 用户空间占用CPU百分比(1.7 us)，系统内核空间占用CPU百分比(0.7 sy)，用户进程空间内改变过优先级的进程占用CPU百分比(0.0 ni)
+        # 空闲CPU百分比(97.7 id)，等待输入输出的CPU时间百分比(0.0 wa)
+        第四行：(物理内存)
+        # 物理内存总量(884936 total)、内存使用量(88288 free)、内存空闲量(409328 used)、作为内核缓存的内存量(387320 buff/cache)
+        第五行：(虚拟内存)
+        # 虚拟内存总量( 0 total)、虚拟内存空闲量(0 free)、虚拟内存使用量( 0 used)、已被提前加载的内存量(265804 avail Mem)
+        eg：top -p 1138      #显示进程号为1138的进程信息，CPU、内存占用率等      
+（3）reboot        
+      # 重启系统      
+        poweroff    
+      # 关闭系统
+（4）pgrep 
+      #  通过程序的名字来查询进程的工具，一般是用来判断程序是否正在运行
+        eg：pgrep python    # 查看当前python的进程id
+（5）kill
+      #  用于终止某个指定PID的服务进程
+      #  -9(彻底杀死进程)
+        eg：kill -9 1908    # 彻底杀死进程1908
+（6）killall
+      #  以名字方式来杀死进程
+       eg：killall nginx
