@@ -22,50 +22,70 @@
   （5）shell的作用就是将这库和系统包裹起来
 
 3，特殊符号
-  （1）*  通配符（多个字符）
+  （1）*  
+     #  通配符（多个字符）
        eg：ls *.c    列出当前目录下所有.c文件
        eg：ls m*     列出所有m开头的文件
        eg：ls *[.]*  列出所有中间有点的文件
        eg: ls [a-c]* 列出所有a，b，c开头的文件   
-  （2）?  通配符（一个字符）
+  （2）?  
+     #  通配符（一个字符）
        eg：ls fis?.py 列出fis开头的四个字符的py文件 
-  （3）|  管道（上个指令的输出，为下个指令的输入）
+  （3）|  
+     #  管道（上个指令的输出，为下个指令的输入）
        eg：ps -ef | grep nginx   在以全格式显示的所有进程信息中，查找包含nginx的进程信息 
-  （4）() 指令群组（会产生子进程）  
-  （5）; 分号（不同的指令中间的分隔符）
-  （6）{ } 指令群组（不会产生子进程）  用于字符串的组合
-        eg：mkdir{a,b,c}-{1,2,3}  会得到6个目录 a1,a2,a3,b1,b2,b3,c1,c2,c3
-  （7）[] 常用于条件判断之后，或者为一个集合
-  （8）& 后台工作
-  （9)  > 重定向输出（会删除里面原有的所有东西）
-  （10）>> 重定向输出（会在里面原有的所有东西后面添加新的内容）
-        在重定向中 0表示标准输入，1表示标准输出，2表示标准错误
-        eg：python hello.py 1>>1.text 2>2.text &
-            将py文件的运行的所有结果记录在1.txt中，将最新一条结果记录在2.txt中，后台运行，其中的1表示标准输出，2表示标准错误
-  （11）< 重定向输出（会读取后面的文件）
-        eg：cat > 1.txt > 2.txt 
-  （12） && 与
-             make && make install     执行make如果没有发生错误就执行make install
+  （4）() 
+     #  指令群组（会产生子进程）  
+  （5）; 
+     #  分号（不同的指令中间的分隔符）
+  （6）{ } 
+     #  指令群组（不会产生子进程）  用于字符串的组合
+       eg：mkdir{a,b,c}-{1,2,3}  会得到6个目录 a1,a2,a3,b1,b2,b3,c1,c2,c3
+  （7）[] 
+     #  常用于条件判断之后，或者为一个集合
+  （8）& 
+     #  后台工作
+  （9)  > 
+     #  重定向输出（会删除里面原有的所有东西）
+  （10）>> 
+     #  重定向输出（会在里面原有的所有东西后面添加新的内容）
+     #  在重定向中 0表示标准输入，1表示标准输出，2表示标准错误
+       eg：python hello.py 1>>1.text 2>2.text &
+           将py文件的运行的所有结果记录在1.txt中，将最新一条结果记录在2.txt中，后台运行，其中的1表示标准输出，2表示标准错误
+  （11）< 
+     #  重定向输出（会读取后面的文件）
+       eg：cat > 1.txt > 2.txt 
+  （12） && 
+     #  与
+        eg：make && make install     执行make如果没有发生错误就执行make install
   （13）./  当前目录   ../  上级目录
 
 
 4，基础操作
-  （1）man 查看指令，配置文件的帮助
-  （2）clear 清屏
-  （3）alias 起别名
+  （1）man 
+     #  查看指令，配置文件的帮助
+  （2）clear 
+     #  清屏
+  （3）alias 
+     #  起别名
        eg：alias fish='clear' 给清屏起个别名fish 输入fish会清屏（等号两边每空格）
-  （4）unalias fish 取消别名
+  （4）unalias fish 
+     # 取消别名
   （5）useradd  添加用户  passwd 修改用户密码  userdel 删除用户
        eg：useradd qwt   passwd qwt
-  （5）touch 新建文件
+  （5）touch 
+     #  新建文件
 
-  （6）ps   显示当前进程状态    -e(-A)(列出所有进程)   -aux(不区分终端显示所有进程)   -ef(显示所有进程的UID,PPIP,C与STIME栏位)
-                进程的五种状态：运行(R)，停止(T)，中断(S)(休眠中，等待信号再次执行)，不可中断(D)，僵死(Z)
-                au(x) 输出格式 : USER(所属用户)   PID(进程id)   %CPU(cpu使用率)    %MEM(记忆体使用率)   VSZ(占用的虚拟记忆体大小)   RSS(占用的记忆体大小)  
-                                        TTY(终端的次要装置号码)   STAT(进程状态)    START(进程开始时间)   TIME(执行的时间)   COMMAN(所执行的指令)                                     
+  （6）ps   
+     # 显示当前进程状态    
+     # -e(-A)(列出所有进程)   -aux(不区分终端显示所有进程)   -ef(显示所有进程的UID,PPIP,C与STIME栏位)
+     # 进程的五种状态：运行(R)，停止(T)，中断(S)(休眠中，等待信号再次执行)，不可中断(D)，僵死(Z)
+     # au(x) 输出格式 : USER(所属用户)   PID(进程id)   %CPU(cpu使用率)    %MEM(记忆体使用率)   VSZ(占用的虚拟记忆体大小)   RSS(占用的记忆体大小)  
+                        TTY(终端的次要装置号码)   STAT(进程状态)    START(进程开始时间)   TIME(执行的时间)   COMMAN(所执行的指令)                                     
        eg： ps -aux | grep nginx  查看nginx进程的信息
-  （7）lsof  列出当前系统打开的文件  -i(显示符合条件的进程情况)  -c(显示某个进程打开的文件)   -u(查看所属用户打开的文件)  
-                   -p(列出某pid打开的所有进程)  -d(指定FD(文件描述符)的文件)
+  （7）lsof  
+     # 列出当前系统打开的文件  
+     # -i(显示符合条件的进程情况)  -c(显示某个进程打开的文件)   -u(查看所属用户打开的文件)  -p(列出某pid打开的所有进程)  -d(指定FD(文件描述符)的文件)
        eg：lsof -i :80   查看80端口现在的使用情况
        eg：lsof -c nginx    查看nginx打开的文件
        eg：lsof /var/log/uwsgi.log   找出谁在使用文件uwsgi.log
@@ -73,123 +93,185 @@
        eg：lsof -u ^wlp   列出除过wlp用户其他用户的进程
        eg：lsof -p 80    列出80端口打开的文件
        eg：lsof  -d txt   列出所有FD是txt的文件
-  （8）curl  利用URL规则在命令行下工作的文件传输工具。它支持文件的上传和下载，所以是综合传输工具   
-                 -vvv(显示详细的错误信息)  -o(将输出写到文件中)   -O(把输出写到该文件中，保留远程文件的文件名)   -u(设置用户名和密码)
-        eg：curl http://admin.libsm.com   会显示出访问页面的html 
-        eg：curl -vvv libsm.com   访问libsm.com并显示所有的错误信息 *开头的是备注 >开头的是浏览器发给服务器的  <开头的是服务器发给浏览器的 
-        eg：curl -o 1.html  libsm.com  将libsm.con的输出保存到1.html里面
-        eg：curl -O http://libsm.com/todo/111.jpg    会把111.jpg保存到当前目录里面
-  （9）nc  用于测试网络,默认为tcp    -u(udp)    -l(监听)
-        eg：nc libsm.com  80    连接服务器80端口，传输协议为tcp，这时候随便发送内容，如果有恢复就是正常，无回复或者No route to host就是不正常
-        eg：nc -u  libsm.com  80  传输协议为udp
-        eg：nc -u  -l  10080    udp监听本机10080端口，如果端口开放会显示Address already in use，如果没法访问，发送内容无回复
+  （8）curl  
+     # 利用URL规则在命令行下工作的文件传输工具。它支持文件的上传和下载，所以是综合传输工具   
+     # -vvv(显示详细的错误信息)  -o(将输出写到文件中)   -O(把输出写到该文件中，保留远程文件的文件名)   -u(设置用户名和密码)
+       eg：curl http://admin.libsm.com   会显示出访问页面的html 
+       eg：curl -vvv libsm.com   访问libsm.com并显示所有的错误信息 *开头的是备注 >开头的是浏览器发给服务器的  <开头的是服务器发给浏览器的 
+       eg：curl -o 1.html  libsm.com  将libsm.con的输出保存到1.html里面
+       eg：curl -O http://libsm.com/todo/111.jpg    会把111.jpg保存到当前目录里面
+  （9）nc  
+     # 用于测试网络,默认为tcp    
+     # -u(udp)    -l(监听)
+       eg：nc libsm.com  80    连接服务器80端口，传输协议为tcp，这时候随便发送内容，如果有恢复就是正常，无回复或者No route to host就是不正常
+       eg：nc -u  libsm.com  80  传输协议为udp
+       eg：nc -u  -l  10080    udp监听本机10080端口，如果端口开放会显示Address already in use，如果没法访问，发送内容无回复
 
 
 5，文件系统
-  （1）ls  列出当前目录下的所有文件 -a(列出隐藏的文件) -l(列出文件的具体信息)
-       ll 相当于 ls -al
-  （2）cd  进入目录
-  （3）whereis  可执行文件的路径在哪里
+  （1）ls  
+     # 列出当前目录下的所有文件 
+     # -a(列出隐藏的文件) -l(列出文件的具体信息)
+     # ll 相当于 ls -al
+  （2）cd  
+     # 进入目录
+  （3）whereis  
+     # 可执行文件的路径在哪里
        eg：whereis  ls  查看ls的路径
-  （4）pwd 查看当前目录
-  （5）file  看文件的属性
+  （4）pwd 
+     # 查看当前目录
+  （5）file  
+     # 看文件的属性
        eg：file 1.py  会显示这是一个ASCII形式的文本文件
-  （6）echo  在屏幕上打印，相当于print
+  （6）echo  
+     # 在屏幕上打印，相当于print
        eg： echo 'hello word'
-  （7）mkdir/rmdir  在当前文件夹下创建和删除文件夹,这个删除只能删除空文件夹，有文件时可以用 rm -rf 来删除  
-  （8）touch 更改文件的创建和访问时间，文件不存在会自动创建   -c(不创建新文件)  -t(更改档案时间)  -r(将指定文件的时间属性代替原文件时间属性)
+  （7）mkdir/rmdir  
+     # 在当前文件夹下创建和删除文件夹,这个删除只能删除空文件夹，有文件时可以用 rm -rf 来删除  
+  （8）touch 
+     # 更改文件的创建和访问时间，文件不存在会自动创建   
+     # -c(不创建新文件)  -t(更改档案时间)  -r(将指定文件的时间属性代替原文件时间属性)
        eg：touch -c 1.txt    将1.txt的档案时间改成当前时间，如果1.txt不存在不会创建文件
        eg：touch -t 03130512 1.txt    将1.txt的档案时间改成3月13日5点12分
        eg：touch -r fish.py 1.txt    将1.txt的时间属性改成和fish.txt一样的时间属性
-  （9）cat 打印出文件里面的内容  -n（给文件前加行号，空格也加）    -b（给文件前加行号，空格不加）
-  （10）cp 复制
+  （9）cat 
+      # 打印出文件里面的内容  
+      #  -n（给文件前加行号，空格也加）    -b（给文件前加行号，空格不加）
+  （10）cp 
+      #  复制
        eg：cp fish.py 1.py   将当前文件夹下fish.py里面的东西复制1.py里面 没有1.py会自动创建
-           cp /fish/1.py  /1.py  将fish文件夹下的1.py 复制到根目录下 
-  （11）rm  删除  -r（迭代式的删除文件夹里面的东西）  -f（强制删除）
-  （12）mv 文件名 文件名 (将前面的文件改成后面文件的名字)
-        mv 文件名 目录名 (将文件移动到目标文件夹中)
-        mv 目录名 目录名 (后面的目录不存在，会给前  面的目录改名。。存在，会移动到后面目录里面)
-  （13）chown/chgrp  改文件所有者/改使用的群体  -R(用于迭代)
+       eg：cp /fish/1.py  /1.py  将fish文件夹下的1.py 复制到根目录下 
+  （11）rm  
+      #  删除  
+      #  -r（迭代式的删除文件夹里面的东西）  -f（强制删除）
+  （12）mv
+      #  mv 文件名 文件名 (将前面的文件改成后面文件的名字)
+      # mv 文件名 目录名 (将文件移动到目标文件夹中)
+      #  mv 目录名 目录名 (后面的目录不存在，会给前  面的目录改名。。存在，会移动到后面目录里面)
+  （13）chown/chgrp  
+      #  改文件所有者/改使用的群体  -R(用于迭代)
         eg：chown -R wlp:wlp 1.py    这样即改了所有者还改了使用群体
-  （14）chmod 改权限   r（读权限） w（写权限） x（执行权限） u（所有者） g（所属群体） o（其他用户）
-                       rwx(111) 拥有全部权限是7  只读权限4  只写权限2
+  （14）chmod 
+      #  改权限   r（读权限） w（写权限） x（执行权限） u（所有者） g（所属群体） o（其他用户）
+      #  rwx(111) 拥有全部权限是7  只读权限4  只写权限2
         eg：chmod 777 1.py  将所有者，所属组，其他用户的权限都改成最高权限
-            chmod u+rx 1.py  给所有者加上读和执行的权限
-            chmod g=rx 1.py  将所属组改成读和执行的权限
-        备注：linux里面的文件只和权限有关和扩展名无关  ./fish.py 运行当前目录下的fish文件
-  （15）grep 查询文件里面的内容
+        eg：chmod u+rx 1.py  给所有者加上读和执行的权限
+        eg：chmod g=rx 1.py  将所属组改成读和执行的权限
+      #  备注：linux里面的文件只和权限有关和扩展名无关  ./fish.py 运行当前目录下的fish文件
+  （15）grep 
+      #  查询文件里面的内容
         eg：grep 'h' ./fish.py   在当前目录下的fish文件里面查询h这个关键字
-  （16）find 在磁盘上查询  -name(查文件名)
+  （16）find 
+      #  在磁盘上查询  
+      #  -name(查文件名)
         eg：find /etc/tem/ -name '*asd*'  在etc里面tem文件夹内查找文件名包含asd的文件
-  （17）ln 建立连接文件   -s (建立一个软连接，建立的软连接指向源文件)
+  （17）ln 
+      #   建立连接文件 
+      #  -s (建立一个软连接，建立的软连接指向源文件)
         eg：ln -s /home/admin/action/api/a.py /b.py   b.py为a.py的软连接，直接访问b.py相当于访问a.py
-  （18）gzip 压缩    -b（解压）
+  （18）gzip 
+      #  压缩    
+      #  -b（解压）
         eg：gzip 1.py   会压缩成文件1.py.gz  源文件会消失
-            gzip -b 1.py.gz  会解压成 1.py 压缩文件会消失
-  （19）tar 打包  -f(指定包的文件名)  -c(产生新的包)  -v(显示所有过程)  -z(使用gzip进行压缩)   -x(解压)
+        eg：gzip -b 1.py.gz  会解压成 1.py 压缩文件会消失
+  （19）tar 
+      #  打包  
+      # -f(指定包的文件名)  -c(产生新的包)  -v(显示所有过程)  -z(使用gzip进行压缩)   -x(解压)
         eg：tar -cvzf 1.tar.gz  *.py  压缩所有.py文件，压缩后的名字为 1.tar.gz 
         eg：tar -xvzf 1.tar.gz        解压 1.tar.gz 
-  （20）diff  比较两个文件内容的差别（如果是目录，比较目录里面相同的文件）         
-                   正常格式 normal(默认情况下)   上下文格式context(加上-c)   合并格式unified(加上-u)  
-                   -b(忽略末尾空格，多个空格当一个空格用)  -w(忽略所有空格及不可见字符)  -i(忽略大小写)
-                    -r(比较子目录中的文件)  -N(建立一个新文件)
+  （20）diff  
+      # 比较两个文件内容的差别（如果是目录，比较目录里面相同的文件）         
+      #  正常格式 normal(默认情况下)   上下文格式context(加上-c)   合并格式unified(加上-u)  
+      #  -b(忽略末尾空格，多个空格当一个空格用)  -w(忽略所有空格及不可见字符)  -i(忽略大小写) -r(比较子目录中的文件)  -N(建立一个新文件)
         eg：diff 1.py 2.py  输出中 5,6c5,6 表示第五到第六行发生了改变，a=add,c=change,d=delete
-            diff -c 1.py 2.py   在输出结果中会显示两边全文，并标注出改变项，  !(表示变化)  +(新增) -(去除)
-            diff -y 1.py 2.py   输出的两个全文，左右对比显示
-            diff -u 1.py 2.py   输出一个全文，@@ -1,7 +1,7 @@   @@表示开始和结束  - 代表第一个文件  +同理 1,7表示第一行到第七行
-            diff -ruN 1.py 2.py > pat.patch  生成补丁文件pat.patch
-  （21）patch 打补丁  -p(设置欲剥离几层路径名称)  路径是从补丁文件所在文件夹开始计算 p1是去掉一层目录  p0为去掉目录前的/
+        eg：diff -c 1.py 2.py   在输出结果中会显示两边全文，并标注出改变项，  !(表示变化)  +(新增) -(去除)
+        eg：diff -y 1.py 2.py   输出的两个全文，左右对比显示
+        eg：diff -u 1.py 2.py   输出一个全文，@@ -1,7 +1,7 @@   @@表示开始和结束  - 代表第一个文件  +同理 1,7表示第一行到第七行
+        eg：diff -ruN 1.py 2.py > pat.patch  生成补丁文件pat.patch
+  （21）patch 
+      # 打补丁  -p(设置欲剥离几层路径名称)  路径是从补丁文件所在文件夹开始计算 p1是去掉一层目录  p0为去掉目录前的/
         eg：patch -p0 1.py pat.patch   给文件1.py打补丁
-  （22）wget  下载文件  -O(指定路径并重命名文件)  -o(将下载信息保存到文件里面)  -b(后台下载)
-        eg：wget http://www.baidu.com  下载百度首页的html文件，并保存到当前文件夹下
-        eg：wget -O /home/baidu.html  http://www.baidu.com  下载百度首页的html文件，并将内容保存到/home路径下的baidu.html文件里面
-        eg：wget -b http://www.baidu.com  后台下载百度首页的html文件
-        eg：wget -o baidu.txt http://www.baidu.com  下载百度首页的html文件，吧并将下载信息保存到baidu.txt里面
-  （23）configure  用于配置安装源代码库和软件    --prefix = 指定配置路径
-         ./configure --prefix=/usr/local/python3   将当前文件夹下的源代码配置到/usr/local/python3
+  （22）wget  
+      # 下载文件
+            # -O(指定路径并重命名文件)  -o(将下载信息保存到文件里面)  -b(后台下载) -r(递归下载) -nd(不创建目录)
+      # -P(下载到指定目录) -p(下载页面内所有资源，包括图片、视频等) -c(断点续传)  -np(当前目录)
+        eg：wget http://www.baidu.com  #下载百度首页的html文件，并保存到当前文件夹下
+        eg：wget -O /home/baidu.html  http://www.baidu.com #下载百度首页的html文件，并将内容保存到/home路径下的baidu.html文件里面
+        eg：wget -b http://www.baidu.com  #后台下载百度首页的html文件
+        eg：wget -o baidu.txt http://www.baidu.com  #下载百度首页的html文件，吧并将下载信息保存到baidu.txt里面
+        eg：wget -P /home/wlp http://www.baidu.com   #将下载的文件保存到/home/wlp路径下
+        eg：wget -r -np -nd http://tel.mirrors.163.com/centos/6.4/os/x86_64/  # 下载该目录下的所有文件
+  （23）configure  
+      # 用于配置安装源代码库和软件    
+      # --prefix = 指定配置路径
+        eg：./configure --prefix=/usr/local/python3   将当前文件夹下的源代码配置到/usr/local/python3
+      # 备注：(配置前需要进入要配置的文件的文件夹，然后执行配置操作，会以文件夹里面的文件为基础进行配置)
   （24）make 编译     make install 安装
          make && make install     执行make如果没有发生错误就执行make install
 
 
 5，磁盘管理
-  （1）df 显示磁盘使用信息  -h(会自动根据大小以kb，mb，gb的形式进行显示)   -m(以mb的形式显示)
+  （1）df 
+      # 显示磁盘使用信息  
+      # -h(会自动根据大小以kb，mb，gb的形式进行显示)   -m(以mb的形式显示)
        eg：df -h 显示磁盘使用情况 （Used：已使用   Available：剩余大小  Use%：剩余大小  Mounted on：磁盘挂载目录）
 
-  （2）du 显示当前目录及子目录所占空间   -a(显示目录及目录下的每个文件占用的空间)   -h(见df)  -s(列出最后相加后总共的值)
+  （2）du 
+      # 显示当前目录及子目录所占空间   
+      # -a(显示目录及目录下的每个文件占用的空间)   -h(见df)  -s(列出最后相加后总共的值)
        eg：du -ah   显示当前目录下所有文件及文件夹的大小
        eg：du ./111/fish.py   查看当前目录下111子目录下fish.py 的大小
 
-  （3）fdisk 磁盘分区的维护  -l(列出所有分区信息)
+  （3）fdisk 
+      # 磁盘分区的维护  
+      # -l(列出所有分区信息)
        eg：fdisk -l  显示磁盘分区情况
 
-  （4）mkfs 格式化磁盘
+  （4）mkfs 
+      #  格式化磁盘
 
-  （5）mount  加载文件系统到指定的加载点(挂载分区，可对挂载目录进行操作) 
+  （5）mount  
+      #  加载文件系统到指定的加载点(挂载分区，可对挂载目录进行操作) 
 
 
 6，用户管理
-  （1）useradd  添加用户   -d(设定用户目录)   -g(指定所属群组)  -e(指定账号的有效期) -u(指定用户id)
-       eg：useradd -d /home/qwt -g root qwt  创建用户qwt，并指定用户目录和群组
-  （2）passwd  修改用户密码  -x(设定密码有效期)  -S(显示密码信息)
-       eg：passwd -x 100 qwt    修改用户qwt有效期100天
-       eg：passwd qwt      修改用户qwt的密码
-       eg：passwd -S qwt    查看用户qwt的密码信息
-  （3）userdel  删除用户   -r(删除用户登入目录以及目录中所有文件)
-       userdel -r qwt  删除用户及用户目录
-  （4）usermod 修改用户帐号设定   -d(修改用户目录)  -e(修改用户有效期)  -g(修改用户所属组)  -l(修改用户账号名)  -u(修改用户id)
-       usermod -d /home/wlp -e 100 qwt  修改用户目录及使用日期
-       usermod -l fish qwt   将用户qwt的名字修改成 fish
-       cat /etc/passwd  查看服务器上所有的用户
-  （5）groupadd  创建工作组   -g(设定工作组id)
-       eg：groupadd -g 123 qwt  创建工作组qwt并设定工作组id
-  （6）groupdel  删除工作组 
-       eg：groupdel qwt
-  （7）groupmod   更改用户识别码和名称  -g(更改识别码)  -n(更改名称)
-       eg：groupmod -n fish qwt 将工作组qwt改成fish
-  （8）id 显示用户和群组id
-       eg：id fish  显示用户fish的id信息
-  （9）groups 查看用户所属组
-       eg：groups fish  查看用户fish所属组情况
+  （1）useradd  
+      #  添加用户   
+      #  -d(设定用户目录)   -g(指定所属群组)  -e(指定账号的有效期) -u(指定用户id)
+        eg：useradd -d /home/qwt -g root qwt  创建用户qwt，并指定用户目录和群组
+  （2）passwd  
+      #  修改用户密码
+            #  -x(设定密码有效期)  -S(显示密码信息)
+        eg：passwd -x 100 qwt    修改用户qwt有效期100天
+        eg：passwd qwt      修改用户qwt的密码
+        eg：passwd -S qwt    查看用户qwt的密码信息
+  （3）userdel  
+      #  删除用户   
+      #  -r(删除用户登入目录以及目录中所有文件)
+        eg：userdel -r qwt  删除用户及用户目录
+  （4）usermod 
+      #  修改用户帐号设定   
+      #  -d(修改用户目录)  -e(修改用户有效期)  -g(修改用户所属组)  -l(修改用户账号名)  -u(修改用户id)
+        eg：usermod -d /home/wlp -e 100 qwt  修改用户目录及使用日期
+        eg：usermod -l fish qwt   将用户qwt的名字修改成 fish
+        eg：cat /etc/passwd  查看服务器上所有的用户
+  （5）groupadd  
+      #  创建工作组   
+      #  -g(设定工作组id)
+        eg：groupadd -g 123 qwt  创建工作组qwt并设定工作组id
+  （6）groupdel  
+      #  删除工作组 
+        eg：groupdel qwt
+  （7）groupmod   
+      #  更改用户识别码和名称  
+      #  -g(更改识别码)  -n(更改名称)
+        eg：groupmod -n fish qwt 将工作组qwt改成fish
+  （8）id 
+      #  显示用户和群组id
+        eg：id fish  显示用户fish的id信息
+  （9）groups 
+      # 查看用户所属组
+        eg：groups fish  查看用户fish所属组情况
 
 
 1. python hello.py 1>>1.text 2>2.text & 
