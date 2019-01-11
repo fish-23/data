@@ -1,0 +1,23 @@
+expdp fish/123  directory=wlp dumpfile=text.dmp logfile=text.log schemas=fish sample=10
+impdp fish/123 directory=wlp dumpfile=text.dmp logfile=text.log remap_tablespace='(sea:ocean)'
+备注：
+1，expdp 数据导出
+2，fish/123 用户名密码
+3，directory=path，导出的文件路径(需要进行设置，path是路径的名字)
+4，dumpfile=text.dmp 导出的数据库文件
+5，logfile=text.log 输出的日志文件
+6，schemas=fish  指定导出的用户
+7，sample=10   导出百分之十的数据
+     #这百分之十的数据是随机的，有可能有的表有数据但是导出的文件中没有一条数据
+8，impdp 导入数据
+9，remap_tablespace 用于更改表空间  (之前的表空间：新的表空间)
+
+报错：ora-39002 ora-39070 ora-39087
+原因：1，没有在视图dba_directories中设置导出目录
+          2，导出数据的用户没有读写这个目录的权限
+解决：1，查看视图dba_directories规定的路径：select * from dba_directories
+                # 有路径直接使用，没定义路径需要手动定义
+          2，定义路径：create directory wlp as 'C:\Users\fish\Desktop'；
+                 # wlp是路径的名字，as后面是具体的路径地址
+          3，grant read,write on directory directory_name to fish;
+                 # 给fish用户分配权限
