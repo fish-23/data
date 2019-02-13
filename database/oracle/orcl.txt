@@ -1,0 +1,84 @@
+一，查看表
+(1) 查询登录用户下的所有表
+select * from user_tab_comments where table_type = 'TABLE'
+(2) 查询登录用户，指定表的字段名
+select * from user_col_comments where table_name = 'HT_SYSTEMMOUDLE'
+
+
+二，索引
+(2) 查询索引对应的字段
+select * from user_ind_columns where index_name = 'MIDDLE';
+select * from user_indexes where table_name=upper('MIDDLE');
+
+
+三，外键
+# https://www.cnblogs.com/chuanzifan/archive/2012/05/13/2497717.html
+(1) 创建外键
+alter table middle add foreign key(stu_id) references student(id);
+# 给 middle的字段stu_id创建一个外键约束，约束的是表student的字段id
+(2) 查找表的外键
+select * from user_constraints c where c.constraint_type = 'R' and c.table_name=upper('middle')
+# 查看middle表的所有外键约束，upper()函数将小写转化成大写
+(3) 查询外键约束的列名
+select * from user_cons_columns cl where cl.constraint_name = 'SYS_C0010806'
+(4) 查询引用表的键的列名
+select * from user_cons_columns cl where cl.constraint_name = 外键引用表的键名
+
+
+四，Oracle查询数据库中所有表的记录数
+# https://www.cnblogs.com/luxd/p/6141476.html
+(1) 数据库更新脚本
+create or replace function count_rows(table_name in varchar2,
+                                      owner      in varchar2 default null)
+  return number authid current_user IS
+  num_rows number;
+  stmt     varchar2(2000);
+begin
+  if owner is null then
+    stmt := 'select count(*) from "' || table_name || '"';
+  else
+    stmt := 'select count(*) from "' || owner || '"."' || table_name || '"';
+  end if;
+  execute immediate stmt
+    into num_rows;
+  return num_rows;
+end;
+
+(2) 查询语句
+# 查询具体表数据的条数
+select table_name, count_rows(table_name) nrows from user_tables where table_name =upper('middle')
+
+(3) 取出具体条数的数据
+# https://blog.csdn.net/yhj198927/article/details/50206471
+SELECT * FROM MIDDLE  WHERE ROWNUM <= 1 ORDER BY id DESC;
+
+
+五，创建数据库(表空间)，用户
+# https://www.cnblogs.com/0201zcr/p/4669548.html
+(1) 创建表空间
+create tablespace wlp datafile 'C:\app\fish\oradata\orcl\wlp.dbf' size 1000m  autoextend on next 300M maxsize unlimited;
+(2) 创建用户
+create user wlp identified by wlp default tablespace wlp quota 500m on users; 
+(3) 给用户赋权限
+grant all privileges to wlp;
+grant connect,resource,dba to wlp;
+(4) 删除数据库
+drop tablespace wlp including contents and datafiles;
+(5) 删除用户
+drop user wlp cascade;
+
+
+六，表结构导入导出
+(1) 表结构导出
+exp ht/ht@orcl file=C:\Users\fish\Desktop\ht.dmp owner=ht rows=n 
+# rows=n表示只导出表结构
+(2) 表结构导入
+imp wlp/wlp@orcl file=C:\Users\fish\Desktop\ht.dmp log=C:\Users\fish\Desktop\fyhis.log  full=y
+
+
+七，导出空表
+# https://blog.csdn.net/u010395242/article/details/78862181
+(1) 查询空表
+    select table_name from user_tables where num_rows='0'
+(2) 创建空表
+    select 'alter table '||table_name||' allocate extent;' from user_tables where num_rows=0 or num_rows is null
