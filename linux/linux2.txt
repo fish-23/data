@@ -80,3 +80,96 @@
 （6）killall
       #  以名字方式来杀死进程
        eg：killall nginx
+
+
+3，系统状态检测命令
+（1）ifconfig
+      # 用于获取网卡配置与网络状态等信息
+      # 网卡名称：eth0     IP地址：inet 192.168.10.10   网卡物理地址(MAC地址)：ether 00:0c:29:c4:a4:09 
+      # 接收数据包：RX packets:14984559 errors:0 dropped:0 overruns:0 frame:0
+      # 发送数据包：TX packets:19236771 errors:0 dropped:0 overruns:0 carrier:0
+       eg：ifconfig              #处于激活状态的网络接口
+       eg：ifconfig -a         #所有配置的网络接口，不论其是否激活
+       eg：ifconfig eth0                 #显示eth0的网卡信息
+       eg：ifconfig eth0 down       #关闭eth0网卡
+       eg：ifconfig eth0 up            #开启eth0网卡
+       eg：ifconfig eth0 192.168.1.56                                          #给eth0网卡配置IP地址
+       eg：ifconfig eth0 192.168.1.56 netmask 255.255.255.0    #给eth0网卡配置IP地址,并加上子掩码
+       eg：ifconfig eth0 192.168.1.56 netmask 255.255.255.0 broadcast 192.168.1.255   
+               #给eth0网卡配置IP地址,加上子掩码,加上个广播地址
+       eg：ifconfig eth0 hw ether 00:AA:BB:CC:DD:EE      #修改MAC地址
+       eg：ifconfig eth0 add 33ffe:3240:800:1005::2/ 64  #为网卡添加IPv6地址
+       eg：ifconfig eth0 del 33ffe:3240:800:1005::2/ 64 #为网卡删除IPv6地址
+       eg：ifconfig eth0 arp   #开启arp功能
+       eg：ifconfig eth0 -arp  #关闭arp功能      
+
+（2）uname
+      # 用于查看系统内核与系统版本等信息
+       eg：uname -a    # 查看详细信息
+
+（3）uptime
+      # 用于查看系统的负载信息，就是top命令第一行的内容
+       eg：uptime     # 22:49:55 up 10 min, 2 users, load average: 0.01, 0.19, 0.18
+
+（4）free
+      # 用于显示当前系统中内存的使用量信息 
+      # -h(以可读的形式显示)
+       eg：free -h   # 	     内存总量       已用量       可用量      进程共享的内存量     磁盘缓存的内存量     缓存的内存量    
+                                     total	         used          free          shared	           buffers	          cached        
+                        Mem:    1.8G	         1.3G          542M       9.8M	           1.6M	          413M
+    -/+ buffers/cache:                        869M        957M	
+                       Swap:     2.0G	         0B	          2.0G
+
+（5）who
+      # 显示目前登入系统的用户信息
+       eg： who -b     # 上次系统启动时间
+
+（6）last
+     # 查看所有系统的登录记录
+       eg：last -6      # 列出6条登录信息
+
+（7）history
+     # 显示历史执行过的命令
+       eg：history >1.txt      #  将历史执行过的命令重定向到1.txt中，如果1.txt中之前有内容，会被删除。 #  >>1.txt 会在1.txt后面追加
+
+
+4，文本文件编辑命令
+（1）cat   
+      # 用于查看纯文本文件（内容较少的）
+      # -n ( 在显示的内容前面加上行号)
+       eg：cat  -n   1.txt       # 查看1.txt中的内容，并在每行内容前面加上行号
+
+（2）more
+      # 用于查看纯文本文件（内容较多的）
+
+（3）head
+      # 用于查看纯文本文档的前N行内容
+      # -n(显示每个文件的前K 行内容)
+       eg：head 1.txt                # 显示前10行
+       eg：head -n 2 1.txt         # 显示前2行
+       eg：head -n -2 1.txt        # 显示从0到倒数第3行
+
+（3）tail 
+      # 用于查看纯文本文档的后N行或持续刷新内容
+      # -f (当文件增长时,输出后续添加的数据)   -n(显示每个文件的后K 行内容)
+       eg：tail 1.txt                  # 显示后10行内容
+       eg：tail -n 3 1.txt           # 显示后3条内容
+       eg：tail -n +8 1.txt         # 显示从第8行开始到最后的内容
+       eg：tail -f 1.txt               # 当文件增长时,输出后续添加的数据
+
+（4）tr
+      # 用于替换文本文件中的字符
+      # 备注：> 将文件写入符号后的文件里面，并删除里面原有的内容
+      # 备注：>>  将文件追加到后面文件里面
+      # 备注：<  读取符号后面的内容     
+       eg：cat 1.txt | tr a-z A-Z > 3.txt           # 将1.txt中的小写字母换成大写字母并存在3.txt中
+       eg：cat 1.txt | tr 'a' 'c'                          # 将1.txt中的 字母小写字母a换成字母小写字母c 
+       eg：tr a c < 1.txt                                 # 会读取1.txt中的文件，并将a替换成c后打印出来                           
+
+（5）wc
+      # 用于统计指定文本的行数、单词数和字节数
+      # -l (显示行数)   -w (显示单词数)  -c (显示字节数)
+       eg：wc 1.txt       # 1 1 2  1.txt         #   1.txt里面有1行内容，共1个单词，总共两个字节      
+
+（6）stat
+      # 用于查看文件的具体存储信息和时间等信息
