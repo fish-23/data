@@ -1,0 +1,36 @@
+1，JDK 安装配置
+（1）下载地址
+         https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+         备注：用curl请求上面的地址，会得到下面 wget后面对应的地址，得到的信息很多，找起来比较麻烦，建议还是直接在window上下载
+         wget https://download.oracle.com/otn-pub/java/jdk/8u201-b09-demos/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64-demos.tar.gz
+（2）解压
+         tar  -xvzf  jdk-8u201-linux-x64.tar.gz
+（3）创建Java文件夹，将jdk放进去
+        mkdir java
+        mv jdk1.8.0_201/ java/
+（4）添加环境变量
+        vim /etc/profile (在最下面添加即可)
+        #jdk
+        export JAVA_HOME=/root/java/jdk1.8.0_201
+        export JRE_HOME=/root/java/jdk1.8.0_201/jre
+        export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
+        export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+（5）重启配置文件
+        source /etc/profile
+
+2，Tomcat 安装配置
+（1）下载
+        wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.16/bin/apache-tomcat-9.0.16.tar.gz
+（2）解压
+         tar -xvzf apache-tomcat-9.0.16.tar.gz -C /root/java > 1.text
+（3）启动程序
+         cd  /root/java/apache-tomcat-9.0.16/bin
+         ./startup.sh
+
+3，Java项目
+（1）直接将war包放到webapps里面，会自动解压
+（2）或者将 Java项目的war压缩包解压到tomcat的root文件夹里面
+         mv jeesns.war /root/java/apache-tomcat-9.0.16/webapps/ROOT
+         jar -xvf jeesns.war >1.txt
+         rm -rf jeesns.war 1.txt
+         备注：jar -cvf 1.war ./        # 将当前目录下的所有文件打包成一个war包
