@@ -268,3 +268,127 @@
        208.164.186.1 deep.openna.com deep
        208.164.186.2 mail.openna.com mail
        208.164.186.3 web.openna.com web
+（6）重启网络服务
+      systemctl restart network
+
+
+5，SHELL脚本
+1，接收参数
+（1）$#  代表参数的总数，6个参数运行脚本后，会将$#替换成6
+（2）$*  代表所有的参数，6个参数运行脚本后，会将$*替换成6个具体的参数
+（3）$?  代表对应的参数，$1 代表第一个参数，$5代表第五个参数，$fish代表参数fish，这个参数需要在前面定义，才能调用
+         $?变量，作用是显示上一次命令的执行返回值。若前面的那条语句成功执行，则$?变量会显示数字0，反之则显示一个非零的数字（可能为1，也可能为2，取决于系统版本）
+（4）$0  代表的是脚本的名称
+（5）脚本示例
+        vim example.sh 
+          #!/bin/bash
+          echo "当前脚本名称为$0"
+          echo "总共有$#个参数，分别是$*。"
+          echo "第1个参数为$1，第5个为$5。"
+       sh example.sh one two three four five six
+          当前脚本名称为example.sh
+          总共有6个参数，分别是one two three four five six。
+          第1个参数为one，第5个为five。
+（6）/dev/null  是一个被称作Linux黑洞的文件，把输出信息重定向到这个文件等同于删除数据
+（7）command > file 2>file  是将command中的标准输出信息存到file中，再将command的错误输出存到file中，并将原来的替换掉
+（8）command >file 2>&1   command的标准输出，加上错误输出后存到 file中  2>&1 将错误输出重定向到标准输出中，最后统一存到文件file中
+（9）command &> /dev/null   将command的标准输出的和错误输出重定向到 /dev/null 中
+
+2，判断语句
+ 备注：判断语句的格式，[空格 判断条件 空格]
+（1）文本判断
+        -d  (测试文件是否为目录类型)
+        -e (测试文件是否存在)
+        -f (判断是否为一般文件)
+        -r (测试当前用户是否有权限读取)
+        -w (测试当前用户是否有权限写入)
+        -x (测试当前用户是否有权限执行)
+（2）逻辑判断
+       &&  (逻辑“与”)
+        ||  (逻辑“或”)
+        !  (逻辑“非”)
+       eg：[ -d /home/fish ]  && echo "Exist"            # 判断路径/home/fish是否是文件夹，是的话打印Exist。与逻辑，两个必须同时满足才会打印
+       eg：[ $USER = root ] || echo "user"                  # 或逻辑，满足一个即可，用户是root或者打印user。如果用户是root就不会打印
+       eg：[ $USER != root ] || echo "administrator"   # 逻辑非
+       eg：[ $USER != root ] && echo "user" || echo "root"   #不是root用户打印user，是root用户打印root
+（3）整数判断
+       -eq  (是否等于)
+       -ne  (是否不等于)
+       -gt  (是否大于)
+       -lt  (是否小于)
+       -le  (是否等于或小于)
+       -ge  (是否大于或等于)
+（4）字符串判断
+      =  (比较字符串内容是否相同)
+      !=  (比较字符串内容是否不同)
+      -z  (判断字符串内容是否为空)
+
+3，流程控制
+（1）if语句
+        （1）语法
+              （1）if 条件 then 操作 fi
+              （2）if 条件 then 操作 else 操作 fi
+              （3）if 条件 then 操作 elif 条件 then 操作 else 操作 fi
+        （2）示例
+              （1）
+                #!/bin/bash
+                DIR="/media/cdrom"
+                if [ ! -e $DIR ]
+                then
+                mkdir -p $DIR
+                fi
+              （2）
+		read -p "Enter your score（0-100）：" GRADE  #接收参数
+		if 
+		[ $GRADE -ge 85 ] && [ $GRADE -le 100 ] 
+		then 
+		echo "$GRADE is good"
+		elif 
+		[ $GRADE -ge 70 ] && [ $GRADE -le 84 ]
+		then 
+		echo "$GRADE is Pass"
+		elif 
+		[ $GRADE -ge 0 ] && [ $GRADE -le 70 ]
+		then
+		echo "$GRADE is Fail" 
+		else
+		echo "$GRADE is bad score" 
+		fi
+（2）循环语句
+	（1）语法
+              （1）for 变量 in 条件  do 操作命令  done
+              （2）while 条件 do 命令 done
+	（2）示例
+	      （1）示例一
+		#!/bin/bash
+		read -p "Enter The Users Password : " PASSWD   #接收用户参数
+		for UNAME in `cat users.txt`
+		do
+		id $UNAME &> /dev/null    # id命令 显示用户名对应的用户信息
+		if [ $? -eq 0 ]           # $? 表示上次输出的结果 0代表上次输出成功
+		then
+		echo "Already exists"
+		else
+		useradd $UNAME &> /dev/null    # useradd命令 添加用户
+		echo "$PASSWD" | passwd --stdin $UNAME &> /dev/null
+		if [ $? -eq 0 ]
+		then
+		echo "$UNAME , Create success"
+		else
+		echo "$UNAME , Create failure"
+		fi
+		fi
+		done	
+	      （2）示例二
+		#!/bin/bash
+		HLIST=$(cat ~/ipadds.txt)    # ~/ 和 ~都表示家目录就是用户目录   $表示将后面的值复制给变量HLIST
+		echo $HLIST                  # 打印变量HLIST
+		for IP in $HLIST
+		do
+		ping -c 3 -i 0.2 -W 3 $IP &> /dev/null
+		if [ $? -eq 0 ] ; then
+		echo "Host $IP is On-line."
+		else
+		echo "Host $IP is Off-line."
+		fi
+		done
