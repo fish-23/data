@@ -1,0 +1,35 @@
+备注：https://www.cnblogs.com/ming5218/p/7965973.html
+
+1，configparser模块是用来解析ini配置文件的解析器，用于读取配置文件
+
+2，ini文件结构
+（1）section的名字是区分大小写的,而key的名字是不区分大小写的
+（2）键值对可用=或者:进行分隔，键值对中头部和尾部的空白符会被去掉
+（3）值可以为多行
+（4）配置文件可以包含注释，注释以#或者;为前缀
+（5）eg：
+        [concurrent]         # section节点，用[]括住
+	thread = 10          # 键值对，中间用=区分
+	processor = 20
+
+3，初始化实例，并读取配置文件
+	import configparser                             # 引用模块
+	config = configparser.ConfigParser()            # 初始化
+	config.read("fish.ini", encoding="utf-8")       # 打开文件，会把文件保存在内存中
+	print(config.sections())                        # 打印配置文件中所有的section节点
+	r = config.get("concurrent", "thread")          # 获取节点下键对应的值
+	# r1 = config.getint("concurrent", "k1")        # 将获取到值转换为int型
+	# r2 = config.getboolean("concurrent", "k2" )   # 将获取到值转换为bool型
+	# r3 = config.getfloat("concurrent", "k3" )     # 将获取到值转换为浮点型
+	print(r)
+	r = config.items("concurrent")                  # 获取section节点下的所有信息
+	config.set("concurrent", "thread", "70")        # 修改thread的值为70
+	config.write(open("fish.ini", "w"))             # 将内存中的数据写入文件，如果刚才修改的配置不存在，会自动增加进文件
+	config.has_section("concurrent")                # 是否存在该section节点，如果不存在，用下面两个=条语句增加
+	config.add_section("dconcurrent")               
+	config.write(open("fish.ini", "w"))
+	config.has_option("sconcurrent", "thread")      # 是否存在该键，不存在用下面两个语句增加
+	onfig.set("concurrent", "thread", "70")
+	config.write(open("fish.ini", "w"))   
+	config.remove_section("default")                # 整个section下的所有内容都将删除
+    	config.write(open("ini", "w"))
