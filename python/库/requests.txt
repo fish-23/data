@@ -1,0 +1,41 @@
+# 备注: https://www.cnblogs.com/mzc1997/p/7813801.html
+1，安装
+（1）pip install requests
+
+2，get请求
+（1）基本请求
+	import requests
+	response = requests.get('http://www.baidu.com')
+	print(response.status_code)  # 打印状态码
+	print(response.url)          # 打印请求url
+	print(response.headers)      # 打印头信息
+	print(response.cookies)      # 打印cookie信息
+	print(response.text)         # 以文本形式打印网页源码
+	print(response.content)      # 以字节流形式打印
+	print(response.json())       # 方法同json.loads(response.text),解析json格式的数据  
+	print(response.cookies)      # 打印cookies
+	for k,v in response.cookies.items():
+		print(k+':'+v)           # 获取cookies的值
+（2）带参数的请求
+	（1）直接加参数
+		import requests
+		response = requests.get('http://www.baidu.com?name=gemey&age=22')
+		print(response.text)
+	（2）指定参数
+		import requests
+		data = {'name': 'tom','age': 20}
+		response = requests.get('http://www.baidu.com', params=data)
+		print(response.text)
+	（3）为请求添加头信息
+		import requests
+		heads = {}
+		heads['User-Agent'] = 'Mozilla/5.0 ' \
+                          '(Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 ' \
+                          '(KHTML, like Gecko) Version/5.1 Safari/534.50'
+		response = requests.get('http://www.baidu.com',headers=headers)
+
+3，post请求
+（1）
+	import requests
+	data = {'name':'tom','age':'22'}
+	response = requests.post('http://www.baidu.com', data=data)
