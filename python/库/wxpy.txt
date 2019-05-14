@@ -1,0 +1,61 @@
+备注：https://www.cnblogs.com/jaycekon/p/WxpyRedis.html
+1，安装
+	python3 -m pip install wxpy
+
+2，连接登录
+	from wxpy import *
+	bot = Bot(console_qr=2,cache_path=True)     # 创建bot对象
+	# cache_path  
+	  （1）设置当前会话的缓存路径，并开启缓存功能
+	  （2）开启缓存后可在短时间内避免重复扫码，缓存失效时会重新要求登陆
+	  （3）设为 `True` 时，使用默认的缓存路径 'wxpy.pkl'
+	        备注；有时登录时会出现登录不上的情况，需要把wxpy.pkl文件删除掉
+	# console_qr 
+	  （1）在终端中显示登陆二维码
+	  （2）后面的数字表示二维码单元格的宽度，通常为 2，也可为负数，表示以反色显示二维码，在白底配色中，应设为 -2
+	# qr_path (设置保存二维码的路径)  
+	
+3，消息发送
+   （1）给文件助手发消息
+        bot.file_helper.send('你好')
+   （2）给好友发消息
+        friends = bot.friends()       # 获取所有的好友，有没有这条语句不影响发消息
+        friend = bot.friends().search('fish')[0]   # 查找好友
+	# 查找好友时，可以加参数max(female女 male男)
+	# friend = bot.friends().search('fish', sex=MALE, city="西安")[0]
+	friend.send('我是机器人，fish助手')      # 发消息
+   （3）给群组发消息
+	groups = bot.groups()
+        group = groups().search("fish")[0]
+	friend.send('我是机器人，fish助手')
+   （4）发送其他文件
+        # 发送文本
+	my_friend.send('Hello, WeChat!')
+	# 发送图片
+	my_friend.send_image('my_picture.png')
+	# 发送视频
+	my_friend.send_video('my_video.mov')
+	# 发送文件
+	my_friend.send_file('my_file.zip')
+	# 以动态的方式发送图片
+	my_friend.send('@img@my_picture.png')
+
+4，回复接收的消息
+   （1）回复所有的消息
+        # 消息接收监听器
+        @bot.register()
+        def print_others(msg):
+        # 输出监听到的消息
+         print(msg)
+        # 回复消息
+        msg.reply("hello world")
+        embed()
+	（2）回复指定好友的消息
+	    friend = bot.friends().search('fish')[0]
+        @bot.register()
+        def print_others(msg):
+        # 输出监听到的消息
+         print(msg)
+        # 回复消息
+        msg.reply("hello world")
+        embed()
