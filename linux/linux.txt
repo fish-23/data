@@ -240,6 +240,12 @@
 
   （5）mount  
       #  加载文件系统到指定的加载点(挂载分区，可对挂载目录进行操作) 
+       eg：mount /dev/sdb2 /backup  把设备/dev/sdb2挂载到/backup目录(这样挂载的文件，重启电脑后会失效)
+      # vim /etc/fstab 修改该文件后，挂载的设备会一直生效
+
+  （6）umount
+     # 撤销已挂载的文件
+       eg：umount /dev/sdb2 
 
 
 6，用户管理
@@ -257,12 +263,13 @@
       #  删除用户   
       #  -r(删除用户登入目录以及目录中所有文件)
         eg：userdel -r qwt  删除用户及用户目录
-  （4）usermod 
-      #  修改用户帐号设定   
-      #  -d(修改用户目录)  -e(修改用户有效期)  -g(修改用户所属组)  -l(修改用户账号名)  -u(修改用户id)
-        eg：usermod -d /home/wlp -e 100 qwt  修改用户目录及使用日期
-        eg：usermod -l fish qwt   将用户qwt的名字修改成 fish
-        eg：cat /etc/passwd  查看服务器上所有的用户
+  （4）usermod 修改用户帐号设定   -d(修改用户目录)  -e(修改用户有效期)  -g(修改用户所属组)  -l(修改用户账号名)  -u(修改用户id)
+               -a(必须与-G选项一起使用，把用户追加到某些组中) -G(修改用户所属的附加群组)
+       eg：usermod -d /home/wlp -e 100 qwt  修改用户目录及使用日期
+       eg：usermod -l fish qwt   将用户qwt的名字修改成 fish
+       eg：cat /etc/passwd  查看服务器上所有的用户
+       eg：usermod -a -G sudo fish  将fish添加到sudo组里面
+       eg：usermod -a -G adm fish   将fish添加到adm组里面(adm 表示admin，可以管理硬件设备)
   （5）groupadd  
       #  创建工作组   
       #  -g(设定工作组id)
