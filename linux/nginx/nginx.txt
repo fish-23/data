@@ -1,0 +1,16 @@
+备注：https://blog.csdn.net/daipianpian/article/details/83034777
+1，命令
+（1）启动: 
+     nginx -c /etc/nginx/nginx.conf
+	 
+（2）服务重启： 
+     service nginx restart
+	 
+（3）快速停止或关闭
+     nginx -s stop
+	 
+（4）正常停止或关闭
+     nginx -s quit
+
+（5）配置文件修改重装载：
+     nginx -s reload
